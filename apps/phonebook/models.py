@@ -15,6 +15,9 @@ class Invite(models.Model):
 
     #: This is the email address of where the invitation is sent.
     recipient = models.EmailField()
+    
+    # This is the message sent alongside the invite. "Hey you're cool."
+    message =  models.TextField(default='')
 
     #: The person who redeemed this invite.
     redeemer = models.OneToOneField('users.UserProfile', null=True)
@@ -44,11 +47,14 @@ class Invite(models.Model):
                                      sender.user.email)
 
         subject = _('Become a Mozillian')
+                
         message = _('Hi there. %s has invited you to join mozillians.org, '
                     'the community directory for Mozilla contributors. You '
                     'can create a community profile for yourself and search '
                     'for other contributors to learn more about them or get '
                     'in touch.' % (sender or _('A fellow Mozillian')))
+        if self.message:
+            message = "%s\n\nPersonal message:\n%s" % (message, self.message)
         # l10n: %s is the registration link.
         link = _("Join Mozillians: %s") % self.get_url()
         message = "%s\n\n%s" % (message, link)
