@@ -68,8 +68,8 @@ class Invite(models.Model):
         link_cooked = _("Join Mozillians: %s") % self.get_url()
 
         message = message.substitute(stock_message=stock_message_cooked,
-                                          personal_message=personal_message_cooked,
-                                          link=link_cooked)
+                                    personal_message=personal_message_cooked,
+                                    link=link_cooked)
 
         send_mail(subject, message, 'no-reply@mozillians.org',
                   [self.recipient])
