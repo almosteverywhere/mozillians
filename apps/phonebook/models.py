@@ -5,6 +5,7 @@ from django.dispatch import receiver
 
 from funfactory.urlresolvers import reverse
 from funfactory.utils import absolutify
+from string import Template
 from tower import ugettext as _
 
 
@@ -15,9 +16,9 @@ class Invite(models.Model):
 
     #: This is the email address of where the invitation is sent.
     recipient = models.EmailField()
-    
+
     # This is the message sent alongside the invite. "Hey you're cool."
-    message =  models.TextField(default='')
+    message = models.TextField(default='')
 
     #: The person who redeemed this invite.
     redeemer = models.OneToOneField('users.UserProfile', null=True)
@@ -47,17 +48,28 @@ class Invite(models.Model):
                                      sender.user.email)
 
         subject = _('Become a Mozillian')
-                
-        message = _('Hi there. %s has invited you to join mozillians.org, '
+
+        # Use a template because the message was getting too complicated
+        # to build out of different pieces.
+        message = Template('$stock_message\n\n$personal_message\n\n$link')
+
+        stock_message_cooked = _('Hi there. %s has invited you to join mozillians.org, '
                     'the community directory for Mozilla contributors. You '
                     'can create a community profile for yourself and search '
                     'for other contributors to learn more about them or get '
                     'in touch.' % (sender or _('A fellow Mozillian')))
+
         if self.message:
-            message = "%s\n\nPersonal message:\n%s" % (message, self.message)
+            personal_message_cooked = "Personal message:\n%s" % (self.message)
+        else:
+            personal_message_cooked = ''
+
         # l10n: %s is the registration link.
-        link = _("Join Mozillians: %s") % self.get_url()
-        message = "%s\n\n%s" % (message, link)
+        link_cooked = _("Join Mozillians: %s") % self.get_url()
+
+        message = message.substitute(stock_message=stock_message_cooked,
+                                          personal_message=personal_message_cooked,
+                                          link=link_cooked)
 
         send_mail(subject, message, 'no-reply@mozillians.org',
                   [self.recipient])
