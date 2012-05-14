@@ -2,12 +2,10 @@ from django.contrib.auth.utils import get_random_string
 from django.core.mail import send_mail
 from django.db import models
 from django.dispatch import receiver
-from django.template import Context
 from django.template.loader import get_template
 
 from funfactory.urlresolvers import reverse
 from funfactory.utils import absolutify
-from string import Template
 from tower import ugettext as _
 
 
@@ -51,14 +49,12 @@ class Invite(models.Model):
 
         subject = _('Become a Mozillian')
 
-        context = Context({
+        template = get_template('phonebook/invite_email.txt')
+
+        message = template.render({
             'personal_message': self.message or '',
             'sender': sender or _('A fellow Mozillian'),
             'link': self.get_url()})
-
-        template = get_template('phonebook/invite_email.txt')
-
-        message = template.render(context)
 
         send_mail(subject, message, 'no-reply@mozillians.org',
                   [self.recipient])
