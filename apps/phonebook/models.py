@@ -2,6 +2,8 @@ from django.contrib.auth.utils import get_random_string
 from django.core.mail import send_mail
 from django.db import models
 from django.dispatch import receiver
+from django.template import Context
+from django.template.loader import get_template
 
 from funfactory.urlresolvers import reverse
 from funfactory.utils import absolutify
@@ -49,27 +51,14 @@ class Invite(models.Model):
 
         subject = _('Become a Mozillian')
 
-        # Use a template because the message was getting too complicated
-        # to build out of different pieces.
-        message = Template('$stock_message\n\n$personal_message\n\n$link')
+        context = Context({
+            'personal_message': self.message or '',
+            'sender': sender or _('A fellow Mozillian'),
+            'link': self.get_url()})
 
-        stock_message_cooked = _('Hi there. %s has invited you to join mozillians.org, '
-                    'the community directory for Mozilla contributors. You '
-                    'can create a community profile for yourself and search '
-                    'for other contributors to learn more about them or get '
-                    'in touch.' % (sender or _('A fellow Mozillian')))
+        template = get_template('phonebook/invite_email.txt')
 
-        if self.message:
-            personal_message_cooked = "Personal message:\n%s" % (self.message)
-        else:
-            personal_message_cooked = ''
-
-        # l10n: %s is the registration link.
-        link_cooked = _("Join Mozillians: %s") % self.get_url()
-
-        message = message.substitute(stock_message=stock_message_cooked,
-                                     personal_message=personal_message_cooked,
-                                     link=link_cooked)
+        message = template.render(context)
 
         send_mail(subject, message, 'no-reply@mozillians.org',
                   [self.recipient])
