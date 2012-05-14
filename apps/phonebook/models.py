@@ -52,7 +52,7 @@ class Invite(models.Model):
         template = get_template('phonebook/invite_email.txt')
 
         message = template.render({
-            'personal_message': self.message or '',
+            'personal_message': self.message,
             'sender': sender or _('A fellow Mozillian'),
             'link': self.get_url()})
 

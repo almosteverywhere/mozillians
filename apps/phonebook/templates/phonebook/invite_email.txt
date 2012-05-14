@@ -10,7 +10,7 @@ in touch.
 
 {{ _("Personal message:") }}
 
-{{ personal_message | safe }}
+{{ personal_message|safe }}
 {% endif %}
 
 {{ _("Join Mozillians:") }} {{ link }}
