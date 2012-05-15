@@ -8,9 +8,9 @@ in touch.
 
 {% if personal_message %}
 
-{{ _("Personal message:") }}
+{{ _('Personal message:') }}
 
-{{ personal_message|safe }}
+{{ personal_message }}
 {% endif %}
 
-{{ _("Join Mozillians:") }} {{ link }}
+{{ _('Join Mozillians:') }} {{ link }}

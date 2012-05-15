@@ -47,14 +47,19 @@ class Invite(models.Model):
                                      sender.user.last_name,
                                      sender.user.email)
 
-        subject = _('Become a Mozillian')
+        subject = ('Become a Mozillian')
 
         template = get_template('phonebook/invite_email.txt')
 
         message = template.render({
             'personal_message': self.message,
-            'sender': sender or _('A fellow Mozillian'),
+            'sender': sender or ('A fellow Mozillian'),
             'link': self.get_url()})
+
+        # manually replace quotes and double-quotes as these get
+        # escaped by the template and this makes the message look bad.
+        message = message.replace('&#39;', '\'')
+        message = message.replace('&#34;', '\"')
 
         send_mail(subject, message, 'no-reply@mozillians.org',
                   [self.recipient])
