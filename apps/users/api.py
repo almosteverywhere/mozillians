@@ -44,7 +44,7 @@ class UserProfileResource(ModelResource):
         authorization = ReadOnlyAuthorization()
         serializer = TimeSerialize()
         resource_name = 'contact'
-        fields = ['display_name', 'id', 'website', 'ircname', 'last_updated']
+        fields = ['display_name', 'id', 'websites', 'ircname', 'last_updated']
 
     def get_object_list(self, request):
         if 'updated' in request.GET:
