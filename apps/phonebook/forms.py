@@ -136,10 +136,10 @@ class ProfileForm(UserForm):
     class Meta:
         # Model form stuff
         model = UserProfile
-        #FIXME: HERE
         fields = ('ircname', 'websites', 'bio', 'photo')
         widgets = {
-            'bio': forms.Textarea()
+            'bio': forms.Textarea(),
+            'websites': forms.Textarea()
         }
 
     def clean_groups(self):

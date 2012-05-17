@@ -95,11 +95,12 @@
           </a></dd>
         {% endif %}
 
-        FIXME: HERE
         {% if profile.websites %}
           <dt>{{ _('Websites') }}</dt>
-          <dd><a rel="me" href="{{ profile.websites }}">
-            {{ profile.websites }}</a>
+          {% for url in profile.websites.split('\n') %}
+            <dd><a rel="me" href="{{ url }}">
+            {% endfor %}
+        {{ profile.websites }}</a>
           </dd>
         {% endif %}
 

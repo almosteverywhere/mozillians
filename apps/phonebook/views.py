@@ -82,7 +82,6 @@ def edit_profile(request):
         initial = dict(first_name=request.user.first_name,
                        last_name=request.user.last_name,
                        bio=profile.bio,
-                       # FIXME: HERE
                        websites=profile.websites,
                        irc_nickname=profile.ircname,
                        groups=user_groups,
