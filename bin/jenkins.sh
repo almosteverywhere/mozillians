@@ -18,12 +18,10 @@ find . -name '*.pyc' -exec rm {} \;
 if [ ! -d "$VENV" ]; then
     echo "Making virtualenv..."
     virtualenv $VENV --no-site-packages
-    pip install --upgrade pip
 fi
 source $VENV/bin/activate
-pip install coverage
+pip install -r requirements/tests-compiled.txt
 pip install -r requirements/compiled.txt
-pip install -r requirements/dev.txt
 
 git submodule sync
 git submodule update --init --recursive
@@ -93,6 +91,10 @@ echo "Creating database if we need it..."
 echo "CREATE DATABASE IF NOT EXISTS ${JOB_NAME}"|mysql -u $DB_USER -h $DB_HOST
 
 echo "Database name: ${JOB_NAME}"
+
+echo "Updating product details."
+
+python manage.py update_product_details
 
 echo "Starting tests..."
 export FORCE_DB=1

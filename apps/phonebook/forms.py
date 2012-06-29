@@ -39,9 +39,8 @@ class SearchForm(happyforms.Form):
         return limit
 
 
-class UsernameWidget(forms.widgets.Input):
-    type = 'text'
-
+class UsernameWidget(forms.widgets.TextInput):
+    """A TextInput with some special markup to indicate a URL."""
     def render(self, *args, **kwargs):
         return mark_safe(u'<span class="label-text">'
                           'http://mozillians.org/ </span>%s' %
@@ -96,6 +95,8 @@ class UserForm(forms.ModelForm):
     def save(self, user):
         # First save the profile info.
         d = self.cleaned_data
+        if d['ircname']:
+            self.instance.ircname = d['ircname']
         super(forms.ModelForm, self).save()
 
         # Then deal with the user info.
@@ -123,20 +124,12 @@ class ProfileForm(UserForm):
                                                          required=False,
                                                          widget=UsernameWidget)
 
-    #: L10n: Street address; not entire address
-    street = forms.CharField(label=_lazy(u'Address'), required=False)
-    city = forms.CharField(label=_lazy(u'City'), required=False)
-    # TODO: Add validation of states/provinces/etc. for known/large countries.
-    province = forms.CharField(label=_lazy(u'Province/State'), required=False)
-    # TODO: Add list of countries.
-    country = forms.CharField(label=_lazy(u'Country'), required=False)
-    postal_code = forms.CharField(label=_lazy(u'Postal/Zip Code'),
-                                  required=False)
-
     class Meta:
         # Model form stuff
         model = UserProfile
-        fields = ('ircname', 'websites', 'bio', 'photo')
+
+        fields = ('ircname', 'websites', 'bio', 'photo', 'country', 'region',
+                  'city')
         widgets = {
             'bio': forms.Textarea(),
             'websites': forms.Textarea()
@@ -166,6 +159,19 @@ class ProfileForm(UserForm):
         return [s.strip()
                 for s in self.cleaned_data['skills'].lower().split(',')
                 if s and ',' not in s]
+
+    def clean(self):
+        """Make sure geographic fields aren't underspecified."""
+        cleaned_data = super(ProfileForm, self).clean()
+        # Rather than raising ValidationErrors for the whole form, we can
+        # add errors to specific fields.
+        if cleaned_data['city'] and not cleaned_data['region']:
+            self._errors['region'] = [_(u'You must specify a region to '
+                                         'specify a city.')]
+        if cleaned_data['region'] and not cleaned_data['country']:
+            self._errors['country'] = [_(u'You must specify a country to '
+                                         'specify a district.')]
+        return cleaned_data
 
     def save(self, request):
         """Save the data to profile."""

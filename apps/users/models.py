@@ -10,8 +10,11 @@ from django.dispatch import receiver
 
 from elasticutils import S
 from elasticutils.models import SearchMixin
-from sorl.thumbnail import ImageField
+from funfactory.urlresolvers import reverse
 from PIL import Image, ImageOps
+from product_details import product_details
+from sorl.thumbnail import ImageField
+from tastypie.models import ApiKey
 from tower import ugettext as _, ugettext_lazy as _lazy
 
 from groups.models import Group, Skill
@@ -21,6 +24,8 @@ from phonebook.helpers import gravatar
 from django.core.files.storage import FileSystemStorage
 fs = FileSystemStorage(location=settings.UPLOAD_ROOT,
                        base_url='/media/uploads/')
+
+COUNTRIES = product_details.get_regions('en-US').items()
 
 
 class UserProfile(SearchMixin, models.Model):
@@ -38,10 +43,12 @@ class UserProfile(SearchMixin, models.Model):
 
     # Foreign Keys and Relationships
     vouched_by = models.ForeignKey('UserProfile', null=True, default=None,
-                                   on_delete=models.SET_NULL)
+                                   on_delete=models.SET_NULL, blank=True)
 
-    groups = models.ManyToManyField('groups.Group')
-    skills = models.ManyToManyField('groups.Skill')
+    groups = models.ManyToManyField(Group, blank=True)
+    skills = models.ManyToManyField(Skill, blank=True)
+
+    # Personal info
     bio = models.TextField(verbose_name=_lazy(u'Bio'), default='', blank=True)
     photo = ImageField(default='', blank=True, storage=fs,
                        upload_to='userprofile')
@@ -49,6 +56,13 @@ class UserProfile(SearchMixin, models.Model):
     ircname = models.CharField(max_length=63,
                                verbose_name=_lazy(u'IRC Nickname'),
                                default='', blank=True)
+    country = models.CharField(max_length=5, default='', blank=True,
+                               choices=COUNTRIES,
+                               verbose_name=_lazy(u'Country'))
+    region = models.CharField(max_length=255, default='', blank=True,
+                              verbose_name=_lazy(u'Province/State'))
+    city = models.CharField(max_length=255, default='', blank=True,
+                            verbose_name=_lazy(u'City'))
 
     @property
     def full_name(self):
@@ -60,6 +74,15 @@ class UserProfile(SearchMixin, models.Model):
     def __unicode__(self):
         """Return this user's name when their profile is called."""
         return self.display_name
+
+    def get_absolute_url(self):
+        return reverse('profile', args=[self.user.username])
+
+    def user_email(self):
+        return self.user.email
+
+    def user_username(self):
+        return self.user.username
 
     def anonymize(self):
         """Remove personal info from a user"""
@@ -137,6 +160,10 @@ class UserProfile(SearchMixin, models.Model):
             # Email the user and tell them they were vouched.
             self._email_now_vouched()
 
+    def get_api_key(self):
+        api_key, created = ApiKey.objects.get_or_create(user=self.user)
+        return api_key.key
+
     def _email_now_vouched(self):
         """Email this user, letting them know they are now vouched."""
         subject = _(u'You are now vouched on Mozillians!')
@@ -187,7 +214,7 @@ def create_user_profile(sender, instance, created, **kwargs):
     dn = '%s %s' % (instance.first_name, instance.last_name)
 
     if created:
-        UserProfile.objects.create(user=instance, display_name=dn)
+        UserProfile.objects.create(user=instance)
     else:
         u = UserProfile.objects.get(user=instance)
         u.display_name = dn
@@ -205,12 +232,14 @@ def auto_vouch(sender, instance, raw, using, **kwargs):
 
 @receiver(models.signals.post_save, sender=UserProfile)
 def add_to_staff_group(sender, instance, created, **kwargs):
-    """Add all mozilla.com users to the "staff" group upon creation."""
-    if created:
-        email = instance.user.email
-        if (any(email.endswith('@' + x) for x in
-                                               settings.AUTO_VOUCH_DOMAINS)):
-            instance.groups.add(Group.objects.get(name='staff', system=True))
+    """Keep users in the staff group if they're autovouchable."""
+    email = instance.user.email
+    staff = Group.objects.get(name='staff', system=True)
+    if any(email.endswith('@' + x) for x in
+           settings.AUTO_VOUCH_DOMAINS):
+        instance.groups.add(staff)
+    elif staff in instance.groups.all():
+        instance.groups.remove(staff)
 
 
 @receiver(dbsignals.post_save, sender=UserProfile)

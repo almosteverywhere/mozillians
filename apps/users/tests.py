@@ -1,12 +1,13 @@
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.test.utils import override_settings
 
 from funfactory.urlresolvers import reverse
 from nose.tools import eq_
 from pyquery import PyQuery as pq
 
 from common import browserid_mock
-from common.tests import ESTestCase, TestCase
+from common.tests import ESTestCase, TestCase, user
 from groups.models import Group
 from users.models import UserProfile
 
@@ -242,6 +243,25 @@ class RegistrationTest(TestCase):
         # Make sure we can't use the same username twice
         assert r.context['form'].errors, "Form should throw errors."
 
+    def test_ircnick(self):
+        username = 'thisisatest'
+        email = 'test@example.com'
+        register = dict(
+                username=username,
+                first_name='David',
+                last_name='Teststhings',
+                optin=True
+        )
+        d = {'assertion': self.fake_assertion}
+
+        with browserid_mock.mock_browserid(email):
+            self.client.post(reverse('browserid_verify'), d, follow=True)
+            self.client.post(reverse('register'), register, follow=True)
+
+        u = User.objects.filter(email=email)[0]
+        p = u.get_profile()
+        eq_(p.ircname, username, 'IRCname should equal username')
+
 
 class TestThingsForPeople(TestCase):
     """Verify that the wrong users don't see things."""
@@ -337,13 +357,14 @@ class TestUser(TestCase):
     """Test User functionality"""
 
     def test_userprofile(self):
-        u = User.objects.create(username='tmp', email='tmp@domain.com')
+        u = user()
 
         UserProfile.objects.all().delete()
 
         # Somehow the User lacks a UserProfile
+        # Note that u.get_profile() caches in memory.
         self.assertRaises(UserProfile.DoesNotExist,
-                          u.get_profile)
+                          lambda: u.userprofile)
 
         # Sign in
         with browserid_mock.mock_browserid(u.email):
@@ -352,6 +373,39 @@ class TestUser(TestCase):
 
         # Good to go
         assert u.get_profile()
+
+    def test_apikey(self):
+        """Test that get_api_key() will create a key if missing."""
+        # A new user will not have a key created.
+        u = user()
+        p = u.get_profile()
+        from tastypie.models import ApiKey
+
+        # A new key is not generated automatically on a user.
+        self.assertRaises(ApiKey.DoesNotExist, lambda: u.api_key)
+
+        # get_api_key will always return a key, creating one if needed.
+        eq_(p.get_api_key(), u.api_key.key)
+
+    def test_blank_ircname(self):
+        username = 'thisisatest'
+        email = 'test@example.com'
+        register = dict(
+                username=username,
+                first_name='David',
+                last_name='Teststhings',
+                optin=True
+        )
+        d = {'assertion': 'rarrr'}
+
+        with browserid_mock.mock_browserid(email):
+            self.client.post(reverse('browserid_verify'), d, follow=True)
+            self.client.post(reverse('register'), register, follow=True)
+
+        u = User.objects.filter(email=email)[0]
+        p = u.get_profile()
+        p.ircname = ''
+        eq_(p.ircname, '', 'We need to allow IRCname to be blank')
 
 
 class TestMigrateRegistration(TestCase):
@@ -391,3 +445,47 @@ class TestMigrateRegistration(TestCase):
                 r = self.client.post(reverse('register'), info, follow=True)
 
             eq_(r.status_code, 200)
+
+
+@override_settings(AUTO_VOUCH_DOMAINS=('mozilla.com',))
+class AutoVouchTests(TestCase):
+
+    def test_only_autovouch_in_staff(self):
+        """Restrict the staff group to emails in AUTO_VOUCH_DOMAINS."""
+        staff = Group.objects.get_or_create(name='staff', system=True)[0]
+        staff_user = user(email='abcd@mozilla.com')
+        staff_profile = staff_user.get_profile()
+        staff_profile.save()
+        assert staff in staff_profile.groups.all(), (
+            'Auto-vouched email in staff group by default.')
+
+        staff_profile.groups.remove(staff)
+        staff_profile.save()
+        assert staff in staff_profile.groups.all(), (
+            'Auto-vouched email cannot be removed from staff group.')
+
+        community_user = user()
+        community_profile = community_user.get_profile()
+        community_profile.save()
+        assert staff not in community_profile.groups.all(), (
+            'Non-auto-vouched email not automatically in staff group.')
+
+        community_profile.groups.add(staff)
+        community_profile.save()
+        assert staff not in community_profile.groups.all(), (
+            'Non-auto-vouched email cannot be added to staff group.')
+
+    def test_autovouch_email(self):
+        """Users with emails in AUTO_VOUCH_DOMAINS should be vouched."""
+        auto_user = user(email='abcd@mozilla.com')
+        auto_profile = auto_user.get_profile()
+        auto_profile.save()
+        assert auto_profile.is_vouched, 'Profile should be vouched.'
+        assert auto_profile.vouched_by is None, (
+            'Profile should not have a voucher.')
+
+        non_auto_user = user()
+        non_auto_profile = non_auto_user.get_profile()
+        non_auto_profile.save()
+        assert not non_auto_profile.is_vouched, (
+            'Profile should not be vouched.')

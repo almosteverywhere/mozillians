@@ -1,12 +1,11 @@
-import time
 from datetime import datetime
 
 from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import ReadOnlyAuthorization
-from tastypie.resources import ModelResource
-from tastypie.serializers import Serializer
+from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
+from common.api import HTMLSerializer
 from users.models import UserProfile
 
 
@@ -24,28 +23,38 @@ class VouchedAuthentication(Authentication):
     def get_identifier(self, request):
         return request.user.username
 
-
-class TimeSerialize(Serializer):
+class PaidStaffAuthentication(Authentication):
     """
-    Appends the time to every response. This is probably not the 'right'
-    way to do this. I don't know how to do it better.
+    API Authentication that only lets in paid staff users
     """
-    def serialize(self, bundle, format='application/json', options={}):
-        bundle['time'] = int(time.time())
-        return super(TimeSerialize, self).serialize(bundle, format, options)
+    def is_authenticated(self, request, **kwargs):
+        user = request.user
+        if (user.is_authenticated() and
+                user.get_profile().groups.filter(name='staff')):
+            return True
 
+        return False
+
+    def get_identifier(self,request):
+        return request.user.username
 
 class UserProfileResource(ModelResource):
     email = fields.CharField(attribute='email', null=True, readonly=True)
 
     class Meta:
         queryset = UserProfile.objects.select_related()
-        authentication = VouchedAuthentication()
+        authentication = PaidStaffAuthentication()
         authorization = ReadOnlyAuthorization()
-        serializer = TimeSerialize()
-        resource_name = 'contact'
+        serializer = HTMLSerializer()
+        list_allowed_methods = ['get']
+        detail_allowed_methods = ['get']
+        resource_name = 'users'
         fields = ['display_name', 'id', 'websites', 'ircname', 'last_updated']
-
+        filtering = {
+                    'display_name': ('exact', 'contains', 'startswith'),
+                    'ircname': ('exact', 'contains', 'startswith'),
+                }
+>
     def get_object_list(self, request):
         if 'updated' in request.GET:
             try:

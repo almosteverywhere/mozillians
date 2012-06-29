@@ -12,6 +12,9 @@ from django.views.decorators.http import require_POST
 
 import commonware.log
 from funfactory.urlresolvers import reverse
+from product_details import product_details
+from funfactory.helpers import urlparams
+from tastypie.models import ApiKey
 from tower import ugettext as _
 
 from groups.helpers import stringify_groups
@@ -56,6 +59,10 @@ def profile(request, username):
 @never_cache
 @login_required
 def edit_profile(request):
+    COUNTRIES = product_details.get_regions(request.locale).items()
+    COUNTRIES = sorted(COUNTRIES, key=lambda country: country[1])
+    COUNTRIES.insert(0, ('', '----'))
+
     profile = request.user.get_profile()
     user_groups = stringify_groups(profile.groups.all().order_by('name'))
     user_skills = stringify_groups(profile.skills.all().order_by('name'))
@@ -66,6 +73,16 @@ def edit_profile(request):
                 request.FILES,
                 instance=profile,
         )
+        form.fields['region'].choices = COUNTRIES
+
+        if 'reset_api_key' in request.POST:
+            # The rest of the form is irrelevant.
+            try:
+                request.user.api_key.delete()
+            except ApiKey.DoesNotExist:
+                pass
+            return redirect(urlparams(reverse('profile.edit'), 'services'))
+
         if form.is_valid():
             old_username = request.user.username
             form.save(request)
@@ -81,19 +98,21 @@ def edit_profile(request):
     else:
         initial = dict(first_name=request.user.first_name,
                        last_name=request.user.last_name,
+                       username=request.user.username,
                        bio=profile.bio,
                        websites=profile.websites,
                        irc_nickname=profile.ircname,
                        groups=user_groups,
                        skills=user_skills)
 
-        if not request.user.username.startswith('u/'):
-            initial.update(username=request.user.username)
-
         form = forms.ProfileForm(
                 instance=profile,
                 initial=initial,
         )
+        form.fields['country'].choices = COUNTRIES
+
+        if not request.user.username.startswith('u/'):
+            initial.update(username=request.user.username)
 
     # When changing this keep in mind that the same view is used for
     # user.register.
@@ -102,7 +121,9 @@ def edit_profile(request):
              user_groups=user_groups,
              my_vouches=UserProfile.objects.filter(vouched_by=profile),
              profile=profile)
-    return render(request, 'phonebook/edit_profile.html', d)
+    # If there are form errors, don't send a 200 OK.
+    status = 400 if form.errors else 200
+    return render(request, 'phonebook/edit_profile.html', d, status=status)
 
 
 @never_cache
@@ -143,7 +164,9 @@ def search(request):
 
         # If nothing has been entered don't load any searches.
         if not (not query and vouched is None and profilepic is None):
-            profiles = UserProfile.search(query, vouched=vouched, photo=profilepic)
+            profiles = UserProfile.search(query,
+                                          vouched=vouched,
+                                          photo=profilepic)
 
             paginator = Paginator(profiles, limit)
 
@@ -155,7 +178,8 @@ def search(request):
                 people = paginator.page(paginator.num_pages)
 
             if len(profiles) == 1:
-                return redirect(reverse('profile', args=[people[0].user.username]))
+                return redirect(reverse('profile',
+                                        args=[people[0].user.username]))
 
             if paginator.count > forms.PAGINATION_LIMIT:
                 show_pagination = True

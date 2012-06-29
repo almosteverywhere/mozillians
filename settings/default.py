@@ -66,8 +66,14 @@ MINIFY_BUNDLES = {
             'css/base-768px.css',
             'css/base-980px.css',
         ),
+        'api': (
+            'css/prettify.css',
+        ),
         'test': (
             'css/qunit.css',
+        ),
+        'edit_profile': (
+            'css/user.css',
         ),
     },
     'js': {
@@ -89,6 +95,10 @@ MINIFY_BUNDLES = {
             'js/main.js',
             'js/browserid.js',
             'js/groups.js',
+        ),
+        'api': (
+            'js/libs/prettify.js',
+            'js/api.js',
         ),
         'edit_profile': (
             'js/libs/tag-it/js/tag-it.js',
@@ -126,6 +136,7 @@ STS_SUBDOMAINS = True
 # Not all URLs need locale.
 SUPPORTED_NONLOCALES = list(base.SUPPORTED_NONLOCALES) + [
     'csp',
+    'api',
 ]
 
 AUTHENTICATION_BACKENDS = ('common.backends.MozilliansBrowserID',)
@@ -149,6 +160,7 @@ INSTALLED_APPS = list(base.INSTALLED_APPS) + [
     'cronjobs',
     'elasticutils',
     'sorl.thumbnail',
+    'tastypie',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -159,7 +171,6 @@ INSTALLED_APPS = list(base.INSTALLED_APPS) + [
     'south',
     # re-assert dominance of 'django_nose'
     'django_nose',
-
 ]
 
 ## Auth
@@ -211,6 +222,7 @@ CSP_IMG_SRC = ("'self'", 'http://statse.webtrendslive.com',
 CSP_SCRIPT_SRC = ("'self'", 'http://statse.webtrendslive.com',
                   'https://statse.webtrendslive.com',
                   'https://browserid.org',)
+CSP_FRAME_SRC = ("'self'", 'https://browserid.org',)
 CSP_REPORT_ONLY = True
 CSP_REPORT_URI = '/csp/report'
 

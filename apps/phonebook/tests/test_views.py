@@ -3,12 +3,13 @@ from uuid import uuid4
 
 from django import test
 from django.contrib.auth.models import User
+from django.test.utils import override_settings
 
 import test_utils
 from nose.tools import eq_
 from pyquery import PyQuery as pq
 
-from common.tests import TestCase
+from common.tests import TestCase, user
 from funfactory.urlresolvers import set_url_prefix, reverse
 
 
@@ -251,8 +252,48 @@ class TestViews(TestCase):
         r = client.get(reverse('profile', args=[self.mozillian.username]))
         doc = pq(r.content)
 
-        assert('http://tofumatt.com/' in [a.get('href') for a in doc('#profile-info dd a')], (
-                'User should have a URL with protocol added.'))
+        assert ('http://tofumatt.com/' in
+                doc('#profile-info dd a[rel=me]')[0].get('href')), (
+            'User should have a URL with protocol added.')
+
+    def test_has_country(self):
+        u = user(username='sam')
+        p = u.get_profile()
+        p.country = 'us'
+        p.save()
+        assert self.client.login(email=u.email)
+        r = self.client.get(reverse('profile', args=[u.username]), follow=True)
+        self.assertContains(r, '<h3>Country</h3>')
+        self.assertNotContains(r, '<h3>Province/State</h3>')
+        self.assertNotContains(r, '<h3>City</h3>')
+
+    def test_has_region(self):
+        u = user(username='sam')
+        p = u.get_profile()
+        p.country = 'us'
+        p.region = 'New York'
+        p.save()
+        assert self.client.login(email=u.email)
+        r = self.client.get(reverse('profile', args=[u.username]), follow=True)
+        self.assertContains(r, '<h3>Country</h3>')
+        self.assertContains(r, '<h3>Province/State</h3>')
+        self.assertContains(r, p.region)
+        self.assertNotContains(r, '<h3>City</h3>')
+
+    def test_has_city(self):
+        u = user(username='sam')
+        p = u.get_profile()
+        p.country = 'us'
+        p.region = 'New York'
+        p.city = 'Brooklyn'
+        p.save()
+        assert self.client.login(email=u.email)
+        r = self.client.get(reverse('profile', args=[u.username]), follow=True)
+        self.assertContains(r, '<h3>Country</h3>')
+        self.assertContains(r, '<h3>Province/State</h3>')
+        self.assertContains(r, p.region)
+        self.assertContains(r, '<h3>City</h3>')
+        self.assertContains(r, p.city)
 
     def test_replace_photo(self):
         """Ensure we can replace photos."""
@@ -274,6 +315,49 @@ class TestViews(TestCase):
         doc = pq(r.content)
         new_photo = doc('#profile-photo').attr('src')
         assert new_photo != old_photo
+
+    @override_settings(AUTO_VOUCH_DOMAINS=('example.com',))
+    def test_api_key(self):
+        """Assert that the Api key will be created and displayed"""
+        u = user(email='test@example.com')
+        assert self.client.login(email=u.email)
+        r = self.client.get(reverse('profile.edit'), follow=True)
+        eq_(200, r.status_code)
+
+        doc = pq(r.content)
+        api_key = doc('#api-key').attr('value')
+
+        p = u.get_profile()
+        assert p.get_api_key() == api_key
+
+    @override_settings(AUTO_VOUCH_DOMAINS=('example.com',))
+    def test_non_staff_api_kei(self):
+        """Assert that non-auto-vouched users don't have an API key."""
+        u = user(email='test@another.com', is_vouched=True)
+        assert self.client.login(email=u.email)
+        r = self.client.get(reverse('profile.edit'), follow=True)
+        eq_(200, r.status_code)
+
+        doc = pq(r.content)
+        eq_(0, len(doc('#api-key')))
+
+    @override_settings(AUTO_VOUCH_DOMAINS=('example.com',))
+    def test_reset_api_key(self):
+        """Assert that resetingthe aPI key changes it."""
+        u = user(email='test@example.com')
+        assert self.client.login(email=u.email)
+        r = self.client.get(reverse('profile.edit'), follow=True)
+        eq_(200, r.status_code)
+
+        doc = pq(r.content)
+        original_api_key = doc('#api-key').attr('value')
+
+        data = {'reset_api_key': True}
+        r = self.client.post(reverse('profile.edit'), data, follow=True)
+
+        doc = pq(r.content)
+        new_api_key = doc('#api-key').attr('value')
+        assert original_api_key != new_api_key
 
 
 class TestVouch(TestCase):

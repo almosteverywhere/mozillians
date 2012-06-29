@@ -7,32 +7,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
-        # Adding model 'UserProfile'
-        db.create_table('profile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('confirmation_code', self.gf('django.db.models.fields.CharField')(unique=True, max_length=32)),
-            ('is_confirmed', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('users', ['UserProfile'])
-
-        # Adding M2M table for field groups on 'UserProfile'
-        db.create_table('profile_groups', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('userprofile', models.ForeignKey(orm['users.userprofile'], null=False)),
-            ('group', models.ForeignKey(orm['groups.group'], null=False))
-        ))
-        db.create_unique('profile_groups', ['userprofile_id', 'group_id'])
+        
+        # Adding field 'Invite.message'
+        db.add_column('invite', 'message', self.gf('django.db.models.fields.TextField')(default=''), keep_default=False)
 
 
     def backwards(self, orm):
-
-        # Deleting model 'UserProfile'
-        db.delete_table('profile')
-
-        # Removing M2M table for field groups on 'UserProfile'
-        db.delete_table('profile_groups')
+        
+        # Deleting field 'Invite.message'
+        db.delete_column('invite', 'message')
 
 
     models = {
@@ -74,19 +57,51 @@ class Migration(SchemaMigration):
         },
         'groups.group': {
             'Meta': {'object_name': 'Group', 'db_table': "'group'"},
+            'always_auto_complete': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'auto_complete': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'irc_channel': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '63', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50', 'db_index': 'True'}),
+            'steward': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.UserProfile']", 'null': 'True', 'blank': 'True'}),
+            'system': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
+            'url': ('django.db.models.fields.SlugField', [], {'max_length': '50', 'db_index': 'True'}),
+            'website': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
+            'wiki': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'})
+        },
+        'groups.skill': {
+            'Meta': {'object_name': 'Skill'},
+            'always_auto_complete': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'auto_complete': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50', 'db_index': 'True'}),
-            'system': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'})
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50', 'db_index': 'True'})
+        },
+        'phonebook.invite': {
+            'Meta': {'object_name': 'Invite', 'db_table': "'invite'"},
+            'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'inviter': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'invites'", 'null': 'True', 'to': "orm['users.UserProfile']"}),
+            'message': ('django.db.models.fields.TextField', [], {'default': "''"}),
+            'recipient': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
+            'redeemed': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'redeemer': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['users.UserProfile']", 'unique': 'True', 'null': 'True'})
         },
         'users.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'profile'"},
-            'confirmation_code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
+            'bio': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'display_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['groups.Group']", 'symmetrical': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_confirmed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+            'ircname': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '63', 'blank': 'True'}),
+            'is_vouched': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_updated': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'auto_now': 'True', 'blank': 'True'}),
+            'photo': ('sorl.thumbnail.fields.ImageField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
+            'skills': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['groups.Skill']", 'symmetrical': 'False'}),
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'}),
+            'vouched_by': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.UserProfile']", 'null': 'True'}),
+            'website': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'null': 'True', 'blank': 'True'})
         }
     }
 
-    complete_apps = ['users']
+    complete_apps = ['phonebook']

@@ -1,3 +1,6 @@
+import random
+from string import letters
+
 from django import test
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -56,3 +59,33 @@ class ESTestCase(TestCase, elasticutils.tests.ESTestCase):
     def tearDownClass(cls):
         TestCase.tearDownClass()
         elasticutils.tests.ESTestCase.tearDownClass()
+
+
+def user(**kwargs):
+    """Return a user with all necessary defaults filled in.
+
+    Default password is 'testpass' unless you say otherwise in a kwarg.
+
+    """
+    save = kwargs.pop('save', True)
+    is_vouched = kwargs.pop('is_vouched', None)
+    vouched_by = kwargs.pop('vouched_by', None)
+    defaults = {}
+    if 'username' not in kwargs:
+        defaults['username'] = ''.join(random.choice(letters)
+                                       for x in xrange(15))
+    if 'email' not in kwargs:
+        defaults['email'] = ''.join(
+            random.choice(letters) for x in xrange(10)) + '@example.com'
+    defaults.update(kwargs)
+    u = User(**defaults)
+    u.set_password(kwargs.get('password', 'testpass'))
+    if save:
+        u.save()
+        profile = u.get_profile()
+        if is_vouched is not None:
+            profile.is_vouched = is_vouched
+        if vouched_by is not None:
+            profile.vouched_by = vouched_by
+        profile.save()
+    return u
