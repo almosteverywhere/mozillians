@@ -1,0 +1,371 @@
+/home/vagrant/mozillians/vendor/lib/python/nose/plugins/manager.py:405: UserWarning: Module hmac was already imported from /usr/lib/python2.6/hmac.pyc, but /usr/local/lib/python2.6/dist-packages is being added to sys.path
+  import pkg_resources
+/home/vagrant/mozillians/vendor/lib/python/nose/plugins/manager.py:405: UserWarning: Module _hashlib was already imported from None, but /usr/local/lib/python2.6/dist-packages is being added to sys.path
+  import pkg_resources
+/home/vagrant/mozillians/vendor/lib/python/nose/plugins/manager.py:405: UserWarning: Module hashlib was already imported from /usr/lib/python2.6/hashlib.pyc, but /usr/local/lib/python2.6/dist-packages is being added to sys.path
+  import pkg_resources
+10:28:1338571689 nose.plugins.manager:DEBUG DefaultPluginManager load plugin nicedots = nosenicedots:NiceDots :/home/vagrant/mozillians/vendor/lib/python/nose/plugins/manager.py:373
+10:28:1338571695 nose.plugins.manager:DEBUG DefaultPluginManager load plugin nicedots = nosenicedots:NiceDots :/home/vagrant/mozillians/vendor/lib/python/nose/plugins/manager.py:373
+/home/vagrant/mozillians/vendor/src/django/django/views/generic/simple.py:8: DeprecationWarning: Function-based generic views have been deprecated; use class-based views instead.
+  DeprecationWarning
+.10:28:1338571711 m.phonebook:WARNING vouch_required forbidding access :/home/vagrant/mozillians/apps/phonebook/views.py:35
+10:28:1338571711 m.phonebook:DEBUG Permission denied middleware, user was authenticated, sending 500 :/home/vagrant/mozillians/apps/common/middleware.py:27
+.EEE10:28:1338571711 pyes:DEBUG Connecting to 127.0.0.1:9200 :/home/vagrant/mozillians/vendor/src/pyes/pyes/connection_http.py:193
+10:28:1338571711 pyes:INFO Starting new HTTP connection (1): 127.0.0.1 :/home/vagrant/mozillians/vendor/src/pyes/pyes/connection_http.py:33
+10:28:1338571711 pyes.urllib3.connectionpool:WARNING Retrying (3 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test :/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py:293
+10:28:1338571711 pyes:INFO Starting new HTTP connection (2): 127.0.0.1 :/home/vagrant/mozillians/vendor/src/pyes/pyes/connection_http.py:33
+10:28:1338571711 pyes.urllib3.connectionpool:WARNING Retrying (2 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test :/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py:293
+10:28:1338571711 pyes:INFO Starting new HTTP connection (3): 127.0.0.1 :/home/vagrant/mozillians/vendor/src/pyes/pyes/connection_http.py:33
+10:28:1338571711 pyes.urllib3.connectionpool:WARNING Retrying (1 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test :/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py:293
+10:28:1338571711 pyes:INFO Starting new HTTP connection (4): 127.0.0.1 :/home/vagrant/mozillians/vendor/src/pyes/pyes/connection_http.py:33
+10:28:1338571711 pyes.urllib3.connectionpool:WARNING Retrying (0 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test :/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py:293
+EEE..EE
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_invites.InviteEdgeTest'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 227, in run
+    self.tearDown()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 350, in tearDown
+    self.teardownContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 366, in teardownContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 41, in tearDownClass
+    User.objects.all().delete()
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 444, in delete
+    collector.collect(del_query)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/deletion.py", line 169, in collect
+    field.rel.on_delete(self, field, sub_objs, self.using)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/deletion.py", line 18, in CASCADE
+    source_attr=field.name, nullable=field.null)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/deletion.py", line 167, in collect
+    if not sub_objs:
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 113, in __nonzero__
+    iter(self).next()
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 107, in _result_iter
+    self._fill_cache()
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 784, in _fill_cache
+    self._result_cache.append(self._iter.next())
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 273, in iterator
+    for row in compiler.results_iter():
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 699, in results_iter
+    for rows in self.execute_sql(MULTI):
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 754, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/backends/mysql/base.py", line 86, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/cursors.py", line 173, in execute
+    self.errorhandler(self, exc, value)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/connections.py", line 36, in defaulterrorhandler
+    raise errorclass, errorvalue
+OperationalError: (1054, "Unknown column 'invite.message' in 'field list'")
+
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_invites.InviteFlowTest'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 208, in run
+    self.setUp()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 291, in setUp
+    self.setupContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 314, in setupContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 19, in setUpClass
+    first_name='Amandeep', last_name='McIlrath')
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 138, in create
+    return self.get_query_set().create(**kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 360, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 556, in save_base
+    result = manager._insert(values, return_id=update_pk, using=using)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 198, in _insert
+    return insert_query(self.model, values, **kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 1456, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 810, in execute_sql
+    cursor = super(SQLInsertCompiler, self).execute_sql(None)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 754, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/backends/mysql/base.py", line 86, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/cursors.py", line 173, in execute
+    self.errorhandler(self, exc, value)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/connections.py", line 36, in defaulterrorhandler
+    raise errorclass, errorvalue
+IntegrityError: (1062, "Duplicate entry '7f3a67u000001' for key 'username'")
+
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_modelform.ModelForms'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 208, in run
+    self.setUp()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 291, in setUp
+    self.setupContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 314, in setupContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 19, in setUpClass
+    first_name='Amandeep', last_name='McIlrath')
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 138, in create
+    return self.get_query_set().create(**kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 360, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 556, in save_base
+    result = manager._insert(values, return_id=update_pk, using=using)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 198, in _insert
+    return insert_query(self.model, values, **kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 1456, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 810, in execute_sql
+    cursor = super(SQLInsertCompiler, self).execute_sql(None)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 754, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/backends/mysql/base.py", line 86, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/cursors.py", line 173, in execute
+    self.errorhandler(self, exc, value)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/connections.py", line 36, in defaulterrorhandler
+    raise errorclass, errorvalue
+IntegrityError: (1062, "Duplicate entry '7f3a67u000001' for key 'username'")
+
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_search.TestSearch'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 208, in run
+    self.setUp()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 291, in setUp
+    self.setupContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 314, in setupContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 51, in setUpClass
+    elasticutils.tests.ESTestCase.setUpClass()
+  File "/home/vagrant/mozillians/vendor/src/elasticutils/elasticutils/tests.py", line 27, in setUpClass
+    cls.es.delete_index_if_exists(index)
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/es.py", line 304, in delete_index_if_exists
+    return self.delete_index(index)
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/es.py", line 297, in delete_index
+    return self._send_request('DELETE', index)
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/es.py", line 197, in _send_request
+    response = self.connection.execute(request)
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/connection_http.py", line 166, in _client_call
+    return getattr(conn.client, attr)(*args, **kwargs)
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/connection_http.py", line 58, in execute
+    response = self.client.urlopen(Method._VALUES_TO_NAMES[request.method], uri, body=request.body, headers=request.headers)
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py", line 294, in urlopen
+    return self.urlopen(method, url, body, headers, retries-1, redirect) # Try again
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py", line 294, in urlopen
+    return self.urlopen(method, url, body, headers, retries-1, redirect) # Try again
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py", line 294, in urlopen
+    return self.urlopen(method, url, body, headers, retries-1, redirect) # Try again
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py", line 294, in urlopen
+    return self.urlopen(method, url, body, headers, retries-1, redirect) # Try again
+  File "/home/vagrant/mozillians/vendor/src/pyes/pyes/urllib3/connectionpool.py", line 255, in urlopen
+    raise MaxRetryError("Max retries exceeded for url: %s" % url)
+MaxRetryError: Max retries exceeded for url: /mozillians_test
+-------------------- >> begin captured logging << --------------------
+pyes: DEBUG: Connecting to 127.0.0.1:9200
+pyes: INFO: Starting new HTTP connection (1): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (3 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (2): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (2 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (3): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (1 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (4): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (0 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+--------------------- >> end captured logging << ---------------------
+
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_trailing_slash_middleware.TrailingSlashMiddlewareTestCase'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 208, in run
+    self.setUp()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 291, in setUp
+    self.setupContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 314, in setupContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 19, in setUpClass
+    first_name='Amandeep', last_name='McIlrath')
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 138, in create
+    return self.get_query_set().create(**kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 360, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 556, in save_base
+    result = manager._insert(values, return_id=update_pk, using=using)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 198, in _insert
+    return insert_query(self.model, values, **kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 1456, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 810, in execute_sql
+    cursor = super(SQLInsertCompiler, self).execute_sql(None)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 754, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/backends/mysql/base.py", line 86, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/cursors.py", line 173, in execute
+    self.errorhandler(self, exc, value)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/connections.py", line 36, in defaulterrorhandler
+    raise errorclass, errorvalue
+IntegrityError: (1062, "Duplicate entry '7f3a67u000001' for key 'username'")
+-------------------- >> begin captured logging << --------------------
+pyes: DEBUG: Connecting to 127.0.0.1:9200
+pyes: INFO: Starting new HTTP connection (1): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (3 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (2): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (2 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (3): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (1 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (4): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (0 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+--------------------- >> end captured logging << ---------------------
+
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_views.TestDeleteUser'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 208, in run
+    self.setUp()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 291, in setUp
+    self.setupContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 314, in setupContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 19, in setUpClass
+    first_name='Amandeep', last_name='McIlrath')
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 138, in create
+    return self.get_query_set().create(**kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 360, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 556, in save_base
+    result = manager._insert(values, return_id=update_pk, using=using)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 198, in _insert
+    return insert_query(self.model, values, **kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 1456, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 810, in execute_sql
+    cursor = super(SQLInsertCompiler, self).execute_sql(None)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 754, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/backends/mysql/base.py", line 86, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/cursors.py", line 173, in execute
+    self.errorhandler(self, exc, value)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/connections.py", line 36, in defaulterrorhandler
+    raise errorclass, errorvalue
+IntegrityError: (1062, "Duplicate entry '7f3a67u000001' for key 'username'")
+-------------------- >> begin captured logging << --------------------
+pyes: DEBUG: Connecting to 127.0.0.1:9200
+pyes: INFO: Starting new HTTP connection (1): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (3 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (2): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (2 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (3): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (1 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+pyes: INFO: Starting new HTTP connection (4): 127.0.0.1
+pyes.urllib3.connectionpool: WARNING: Retrying (0 attempts remain) after connection broken by 'error(111, 'Connection refused')': /mozillians_test
+--------------------- >> end captured logging << ---------------------
+
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_views.TestViews'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 208, in run
+    self.setUp()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 291, in setUp
+    self.setupContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 314, in setupContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 19, in setUpClass
+    first_name='Amandeep', last_name='McIlrath')
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 138, in create
+    return self.get_query_set().create(**kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 360, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 556, in save_base
+    result = manager._insert(values, return_id=update_pk, using=using)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 198, in _insert
+    return insert_query(self.model, values, **kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 1456, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 810, in execute_sql
+    cursor = super(SQLInsertCompiler, self).execute_sql(None)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 754, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/backends/mysql/base.py", line 86, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/cursors.py", line 173, in execute
+    self.errorhandler(self, exc, value)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/connections.py", line 36, in defaulterrorhandler
+    raise errorclass, errorvalue
+IntegrityError: (1062, "Duplicate entry '7f3a67u000001' for key 'username'")
+
+======================================================================
+ERROR: test suite for <class 'mozillians.apps.phonebook.tests.test_views.TestVouch'>
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 208, in run
+    self.setUp()
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 291, in setUp
+    self.setupContext(ancestor)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/suite.py", line 314, in setupContext
+    try_run(context, names)
+  File "/home/vagrant/mozillians/vendor/lib/python/nose/util.py", line 478, in try_run
+    return func()
+  File "/home/vagrant/mozillians/apps/common/tests.py", line 19, in setUpClass
+    first_name='Amandeep', last_name='McIlrath')
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 138, in create
+    return self.get_query_set().create(**kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 360, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/base.py", line 556, in save_base
+    result = manager._insert(values, return_id=update_pk, using=using)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/manager.py", line 198, in _insert
+    return insert_query(self.model, values, **kwargs)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/query.py", line 1456, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 810, in execute_sql
+    cursor = super(SQLInsertCompiler, self).execute_sql(None)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/models/sql/compiler.py", line 754, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vagrant/mozillians/vendor/src/django/django/db/backends/mysql/base.py", line 86, in execute
+    return self.cursor.execute(query, args)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/cursors.py", line 173, in execute
+    self.errorhandler(self, exc, value)
+  File "/usr/local/lib/python2.6/dist-packages/MySQLdb/connections.py", line 36, in defaulterrorhandler
+    raise errorclass, errorvalue
+IntegrityError: (1062, "Duplicate entry '7f3a67u000001' for key 'username'")
+
+----------------------------------------------------------------------
+Ran 4 tests in 7.860s
+
+FAILED (errors=8)
+nosetests --verbosity 1 phonebook
+Creating test database for alias 'default'...
+...Skipping setup of test_mozillians!
+...Try FORCE_DB=true if you need fresh databases.

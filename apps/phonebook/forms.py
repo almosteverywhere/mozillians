@@ -130,6 +130,7 @@ class ProfileForm(UserForm):
 
         fields = ('ircname', 'websites', 'bio', 'photo', 'country', 'region',
                   'city')
+
         widgets = {
             'bio': forms.Textarea(),
             'websites': forms.Textarea()
