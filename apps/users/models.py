@@ -31,6 +31,8 @@ class UserProfile(SearchMixin, models.Model):
     # Other fields here
     is_vouched = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True, default=datetime.now)
+    # Because they have no other associated data, store websites as a
+    # big textarea list of urls that we parse at display time.
     websites = models.TextField(verbose_name=_lazy(u'Websites'),
                               default='', blank=True, null=True)
 

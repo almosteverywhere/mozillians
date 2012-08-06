@@ -2,24 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d6446431-e293-463a-ae44-b44c26081165" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/mozillians.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/src/django-mobility" afterPath="$PROJECT_DIR$/vendor/src/django-mobility" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/src/elasticutils" afterPath="$PROJECT_DIR$/vendor/src/elasticutils" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor/src/happyforms" afterPath="$PROJECT_DIR$/vendor/src/happyforms" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/vendor" afterPath="$PROJECT_DIR$/vendor" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/phonebook/forms.py" afterPath="$PROJECT_DIR$/apps/phonebook/forms.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/phonebook/templates/phonebook/edit_profile.html" afterPath="$PROJECT_DIR$/apps/phonebook/templates/phonebook/edit_profile.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/phonebook/templates/phonebook/profile.html" afterPath="$PROJECT_DIR$/apps/phonebook/templates/phonebook/profile.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/phonebook/views.py" afterPath="$PROJECT_DIR$/apps/phonebook/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/users/admin.py" afterPath="$PROJECT_DIR$/apps/users/admin.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/users/api.py" afterPath="$PROJECT_DIR$/apps/users/api.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/users/forms.py" afterPath="$PROJECT_DIR$/apps/users/forms.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/apps/users/models.py" afterPath="$PROJECT_DIR$/apps/users/models.py" />
     </list>
     <ignored path="mozillians.iws" />
@@ -45,7 +32,7 @@
       <file leaf-file-name="forms.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/apps/users/forms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="41" selection-start="655" selection-end="655" vertical-scroll-proportion="-162.5">
+            <state line="20" column="41" selection-start="655" selection-end="655" vertical-scroll-proportion="-300.0">
               <folding>
                 <element signature="e#0#24#0" expanded="true" />
               </folding>
@@ -62,10 +49,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="forms.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="forms.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/apps/phonebook/forms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="138" column="38" selection-start="5538" selection-end="5538" vertical-scroll-proportion="0.0">
+            <state line="138" column="38" selection-start="5538" selection-end="5538" vertical-scroll-proportion="0.44973546">
               <folding />
             </state>
           </provider>
@@ -83,7 +70,7 @@
       <file leaf-file-name="edit_profile.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/apps/phonebook/templates/phonebook/edit_profile.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="36" selection-start="1137" selection-end="1137" vertical-scroll-proportion="-7.875">
+            <state line="27" column="36" selection-start="1137" selection-end="1137" vertical-scroll-proportion="-5.0">
               <folding />
             </state>
           </provider>
@@ -92,7 +79,7 @@
       <file leaf-file-name="profile.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/apps/phonebook/templates/phonebook/profile.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="106" column="31" selection-start="3366" selection-end="3366" vertical-scroll-proportion="-9.75">
+            <state line="106" column="32" selection-start="3366" selection-end="3366" vertical-scroll-proportion="-6.4166665">
               <folding />
             </state>
           </provider>
@@ -107,10 +94,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="models.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="models.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/apps/users/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="174" column="58" selection-start="6160" selection-end="6160" vertical-scroll-proportion="0.3321033">
+            <state line="34" column="33" selection-start="1186" selection-end="1186" vertical-scroll-proportion="-8.12">
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -136,14 +123,14 @@
         <option value="$PROJECT_DIR$/apps/phonebook/forms.py" />
         <option value="$PROJECT_DIR$/apps/phonebook/views.py" />
         <option value="$PROJECT_DIR$/apps/phonebook/templates/phonebook/edit_profile.html" />
-        <option value="$PROJECT_DIR$/apps/phonebook/templates/phonebook/profile.html" />
         <option value="$PROJECT_DIR$/apps/users/api.py" />
         <option value="$PROJECT_DIR$/apps/users/models.py" />
+        <option value="$PROJECT_DIR$/apps/phonebook/templates/phonebook/profile.html" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-6" />
+    <option name="x" value="1914" />
     <option name="y" value="25" />
     <option name="width" value="1932" />
     <option name="height" value="1034" />
@@ -367,13 +354,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="25" width="1932" height="1034" extended-state="6" />
-    <editor active="false" />
+    <frame x="1914" y="25" width="1932" height="1034" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299435" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3299435" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3299435" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3299435" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14727855" sideWeight="0.36949152" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14727855" sideWeight="0.6700565" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -444,9 +431,16 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/apps/users/api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="49" selection-start="1492" selection-end="1492" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/apps/users/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="41" selection-start="655" selection-end="655" vertical-scroll-proportion="-162.5">
+        <state line="20" column="41" selection-start="655" selection-end="655" vertical-scroll-proportion="-300.0">
           <folding>
             <element signature="e#0#24#0" expanded="true" />
           </folding>
@@ -460,9 +454,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/apps/phonebook/forms.py">
+    <entry file="file://$PROJECT_DIR$/apps/users/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="138" column="38" selection-start="5538" selection-end="5538" vertical-scroll-proportion="0.0">
+        <state line="34" column="33" selection-start="1186" selection-end="1186" vertical-scroll-proportion="-8.12">
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/phonebook/templates/phonebook/profile.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="106" column="32" selection-start="3366" selection-end="3366" vertical-scroll-proportion="-6.4166665">
           <folding />
         </state>
       </provider>
@@ -476,31 +479,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/phonebook/templates/phonebook/edit_profile.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="36" selection-start="1137" selection-end="1137" vertical-scroll-proportion="-7.875">
+        <state line="27" column="36" selection-start="1137" selection-end="1137" vertical-scroll-proportion="-5.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/apps/phonebook/templates/phonebook/profile.html">
+    <entry file="file://$PROJECT_DIR$/apps/phonebook/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="106" column="31" selection-start="3366" selection-end="3366" vertical-scroll-proportion="-9.75">
+        <state line="138" column="38" selection-start="5538" selection-end="5538" vertical-scroll-proportion="0.44973546">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/apps/users/api.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="49" selection-start="1492" selection-end="1492" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/apps/users/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="174" column="58" selection-start="6160" selection-end="6160" vertical-scroll-proportion="0.3321033">
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>

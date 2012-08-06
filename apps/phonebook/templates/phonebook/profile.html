@@ -103,9 +103,10 @@
 
         {% if profile.websites %}
           <dt>{{ _('Websites') }}</dt>
-          <dd><a rel="me" href="{{ profile.websites }}">
-            {{ profile.websites }}</a>
-          </dd>
+          {% for site in profile.websites.split(",") %}
+            <dd>{{site | urlize }}
+            </dd>
+          {% endfor %}
         {% endif %}
 
         {% if profile.location %}
