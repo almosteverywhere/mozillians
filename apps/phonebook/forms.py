@@ -138,7 +138,8 @@ class ProfileForm(UserForm):
         model = UserProfile
         fields = ('ircname', 'websites', 'bio', 'photo')
         widgets = {
-            'bio': forms.Textarea()
+            'bio': forms.Textarea(),
+            # TODO this should be a widget i think, why does this not work?
         }
 
     def clean_groups(self):

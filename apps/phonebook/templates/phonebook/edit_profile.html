@@ -26,6 +26,12 @@
           {{ bootstrap(form.first_name) }}
           {{ bootstrap(form.last_name) }}
           {{ bootstrap(form.websites) }}
+          <span class="help-inline">
+            {% trans %}
+              Separate each website with a comma.
+              TODO: this should look better.
+            {% endtrans %}
+          </span>
           {{ bootstrap(form.bio) }}
         </div>
         <div class="tab-pane" id="skills">
