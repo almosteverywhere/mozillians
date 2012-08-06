@@ -25,3 +25,4 @@ settings/*local.py
 directory
 media/uploads
 media/cache
+.idea
