@@ -18,4 +18,5 @@ class RegistrationForm(UserForm):
         fields = ('first_name', 'last_name', 'username', 'bio', 'optin')
         widgets = {
             'bio': forms.Textarea(),
+            'websites': forms.Textarea(),
         }

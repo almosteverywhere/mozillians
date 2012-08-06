@@ -1,0 +1,2081 @@
+     class Meta:
+         # Model form stuff
+         model = UserProfile
+-
+-        fields = ('ircname', 'websites', 'bio', 'photo', 'country', 'region',
+-                  'city')
+-
++        fields = ('ircname', 'website', 'bio', 'photo')
+         widgets = {
+-            'bio': forms.Textarea(),
+-            'websites': forms.Textarea()
++            'bio': forms.Textarea()
+         }
+ 
+index 3913667..e91f56d 100644
+--- a/apps/phonebook/models.py
++++ b/apps/phonebook/models.py
+@@ -18,7 +18,7 @@ class Invite(models.Model):
+     recipient = models.EmailField()
+ 
+-          {{ bootstrap(form.ircname) }}
+-          {{ bootstrap(form.websites) }}
++          {{ bootstrap(form.website) }}
+           {{ bootstrap(form.bio) }}
+-
+-          <h2>{{ _('Location') }}</h2>
+
+@@ -96,12 +101,10 @@
+           </a></dd>
+         {% endif %}
+ 
+-        {% if profile.websites %}
+-          <dt>{{ _('Websites') }}</dt>
+-          {% for url in profile.websites.split('\n') %}
+-            <dd><a rel="me" href="{{ url }}">
+-            {% endfor %}
+-        {{ profile.websites }}</a>
++        {% if profile.website %}
++          <dt>{{ _('Website') }}</dt>
++          <dd><a rel="me" href="{{ profile.website }}">
++            {{ profile.website }}</a>
+           </dd>
+         {% endif %}
+ 
+             
+form.save(request)
+@@ -98,21 +81,19 @@ def edit_profile(request):
+     else:
+         initial = dict(first_name=request.user.first_name,
+                        last_name=request.user.last_name,
+-                       username=request.user.username,
+                        bio=profile.bio,
+-                       websites=profile.websites,
++                       website=profile.website,
+                        irc_nickname=profile.ircname,
+                        groups=user_groups,
+                        skills=user_skills)
+ 
++        if not request.user.username.startswith('u/'):
++            initial.update(username=request.user.username)
++
+         form = forms.ProfileForm(
+                 instance=profile,
+                 initial=initial,
+         )
+-        form.fields['country'].choices = COUNTRIES
+-
+-        if not request.user.username.startswith('u/'):
+-            initial.update(username=request.user.username)
+ 
+-
+-    # Because they have no other associated data, store websites as a
+-    # big textarea list of urls that we parse at display time.
+-    websites = models.TextField(max_length=600, verbose_name=_lazy(u'Websites'),
++    website = models.URLField(max_length=200, verbose_name=_lazy(u'Website'),
+                               default='', blank=True, null=True)
+--- /dev/null
++++ b/lib/product_details_json/firefox_history_development_releases.json
+@@ -0,0 +1 @@
++{"1.0rc1":"2004-10-27","1.0rc2":"2004-11-03","1.5rc1":"2005-11-01","1.5rc2":"2005-11-10","1.5rc3":"2005-11-17","2.0b1":"2006-07-12","2.0b2":"2006-08-31","2.0rc1":"2006-09-26","2.0rc2":"2006-10-06","2.0rc3":"2007-10-16","3.0b1":"2007-11-19","3.0b2":"2007-12-18","3.0b3":"2008-02-12","3.0b4":"2008-03-10","3.0b5":"2008-04-02","3.0rc1":"2008-05-16","3.0rc2":"2008-06-03","3.1b1":"2008-08-14","3.1b2":"2008-12-08","3.1b3":"2009-03-12","3.5b4":"2009-04-27","3.5rc2":"2009-06-19","3.5rc3":"2009-06-24","3.6b1":"2009-10-30","3.6b2":"2009-11-10","3.6b3":"2009-11-17","3.6b4":"2009-11-26","3.6b5":"2009-12-17","3.6rc1":"2010-01-08","3.6rc2":"2010-01-17","3.6.3plugin1":"2010-04-08","3.6.4build1":"2010-04-20","3.6.4build3":"2010-05-04","3.6.4build4":"2010-05-14","3.6.4build5":"2010-05-26","3.6.4build6":"2010-05-28","3.6.4build7":"2010-06-14","3.6.7build1":"2010-07-02","4.0b1":"2010-07-06","4.0b2":"2010-07-27","4.0b3":"2010-08-11","4.0b4":"2010-08-24","4.0b5":"2010-09-07","4.0b6":"2010-09-14","4.0b7":"2010-11-10","4.0b8":"2010-12-22","4.0b9":"2011-01-14","4.0b10":"2011-01-25"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/firefox_history_major_releases.json b/lib/product_details_json/firefox_history_major_releases.json
+new file mode 100644
+index 0000000..f1cf9b7
+--- /dev/null
++++ b/lib/product_details_json/firefox_history_major_releases.json
+@@ -0,0 +1 @@
++{"1.0":"2004-11-09","1.5":"2005-11-29","2.0":"2006-10-24","3.0":"2008-06-17","3.5":"2009-06-30","3.6":"2010-01-21"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/firefox_history_stability_releases.json b/lib/product_details_json/firefox_history_stability_releases.json
+new file mode 100644
+index 0000000..368f5db
+--- /dev/null
++++ b/lib/product_details_json/firefox_history_stability_releases.json
+@@ -0,0 +1 @@
++{"1.0.1":"2005-02-24","1.0.2":"2005-03-23","1.0.3":"2005-04-15","1.0.4":"2005-05-11","1.0.5":"2005-07-12","1.0.6":"2005-07-19","1.0.7":"2005-09-20","1.0.8":"2006-04-13","1.5.0.1":"2006-02-01","1.5.0.2":"2006-04-13","1.5.0.3":"2006-05-02","1.5.0.4":"2006-06-01","1.5.0.5":"2006-07-26","1.5.0.6":"2006-08-02","1.5.0.7":"2006-09-14","1.5.0.8":"2006-11-07","1.5.0.9":"2006-12-19","1.5.0.10":"2007-02-23","1.5.0.11":"2007-03-20","1.5.0.12":"2007-05-30","2.0.0.1":"2006-12-19","2.0.0.2":"2007-02-23","2.0.0.3":"2007-03-20","2.0.0.4":"2007-05-30","2.0.0.5":"2007-07-17","2.0.0.6":"2007-07-30","2.0.0.7":"2007-09-18","2.0.0.8":"2007-10-18","2.0.0.9":"2007-11-01","2.0.0.10":"2007-11-26","2.0.0.11":"2007-11-30","2.0.0.12":"2008-02-07","2.0.0.13":"2008-03-25","2.0.0.14":"2008-04-16","2.0.0.15":"2008-07-01","2.0.0.16":"2008-07-15","2.0.0.17":"2008-09-23","2.0.0.18":"2008-11-12","2.0.0.19":"2008-12-16","2.0.0.20":"2008-12-18","3.0.1":"2008-07-16","3.0.2":"2008-09-23","3.0.3":"2008-09-26","3.0.4":"2008-11-12","3.0.5":"2008-12-16","3.0.6":"2009-02-03","3.0.7":"2009-03-04","3.0.8":"2009-03-27","3.0.9":"2009-04-21","3.0.10":"2009-04-27","3.0.11":"2009-06-11","3.0.12":"2009-07-21","3.0.13":"2009-08-03","3.0.14":"2009-09-09","3.0.15":"2009-10-27","3.0.16":"2009-12-15","3.0.17":"2010-01-05","3.0.18":"2010-02-17","3.0.19":"2010-03-30","3.5.1":"2009-07-17","3.5.2":"2009-08-03","3.5.3":"2009-09-09","3.5.4":"2009-10-27","3.5.5":"2009-11-05","3.5.6":"2009-12-15","3.5.7":"2010-01-05","3.5.8":"2010-02-17","3.5.9":"2010-03-30","3.5.10":"2010-06-22","3.5.11":"2010-07-20","3.5.12":"2010-09-07","3.5.13":"2010-09-15","3.5.14":"2010-10-19","3.5.15":"2010-10-27","3.6.16":"2010-12-09","3.6.2":"2010-03-22","3.6.3":"2010-04-01","3.6.4":"2010-06-22","3.6.6":"2010-06-26","3.6.7":"2010-07-20","3.6.8":"2010-07-23","3.6.9":"2010-09-07","3.6.10":"2010-09-15","3.6.11":"2010-10-19","3.6.12":"2010-10-27","3.6.13":"2010-12-09"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/firefox_primary_builds.json b/lib/product_details_json/firefox_primary_builds.json
+new file mode 100644
+index 0000000..618e3ef
+--- /dev/null
++++ b/lib/product_details_json/firefox_primary_builds.json
+@@ -0,0 +1 @@
++{"af":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"ak":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"ar":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"as":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"be":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"bg":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"bn-BD":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"bn-IN":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"br":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"ca":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"cs":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"cy":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"da":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":11}}},"de":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"el":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"en-GB":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"en-US":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8},"OS X":{"filesize":19},"Linux":{"filesize":9.8}},"3.6.13":{"Windows":{"filesize":8},"OS X":{"filesize":19},"Linux":{"filesize":9.8}}},"en-ZA":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"eo":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"es-AR":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"es-ES":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"et":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"eu":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"fa":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"fi":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"fr":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.1},"OS X":{"filesize":19},"Linux":{"filesize":9.8}},"3.6.13":{"Windows":{"filesize":8.1},"OS X":{"filesize":19},"Linux":{"filesize":9.8}}},"fy-NL":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"ga-IE":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"gl":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"gu-IN":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"he":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"hi-IN":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"hr":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"hu":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.4},"OS X":{"filesize":19},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.4},"OS X":{"filesize":19},"Linux":{"filesize":11}}},"hy-AM":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"id":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"is":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"it":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"ja":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":8},"OS X":{"filesize":19},"Linux":{"filesize":9.8}}},"ka":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"3.6.13":{"Windows":{"filesize":8},"OS X":{"filesize":19},"Linux":{"filesize":9.8}}},"kk":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"kn":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"ko":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"ku":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":[]},"lg":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"lt":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.1},"OS X":{"filesize":19},"Linux":{"filesize":9.9}},"3.6.13":{"Windows":{"filesize":8.1},"OS X":{"filesize":19},"Linux":{"filesize":9.9}}},"lv":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.4},"OS X":{"filesize":20},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.4},"OS X":{"filesize":20},"Linux":{"filesize":11}}},"mai":{"4.0b10":{"Windows":{"filesize":8.3},"OS X":{"filesize":20},"Linux":{"filesize":11}}},"mk":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.3},"OS X":{"filesize":20},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.3},"OS X":{"filesize":20},"Linux":{"filesize":11}}},"ml":{"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"mr":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"nb-NO":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"nl":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.7},"OS X":{"filesize":20},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.7},"OS X":{"filesize":20},"Linux":{"filesize":11}}},"nn-NO":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"nso":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"oc":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"or":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"pa-IN":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"pl":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.7},"OS X":{"filesize":20},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.7},"OS X":{"filesize":20},"Linux":{"filesize":11}}},"pt-BR":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"pt-PT":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8},"OS X":{"filesize":19},"Linux":{"filesize":9.8}},"3.6.13":{"Windows":{"filesize":8},"OS X":{"filesize":19},"Linux":{"filesize":9.8}}},"ro":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.2},"OS X":{"filesize":19},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.2},"OS X":{"filesize":19},"Linux":{"filesize":11}}},"ru":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.2},"OS X":{"filesize":19},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.2},"OS X":{"filesize":19},"Linux":{"filesize":11}}},"si":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.2},"OS X":{"filesize":19},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"sk":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.3},"OS X":{"filesize":19},"Linux":{"filesize":11}},"3.6.13":{"Windows":{"filesize":8.3},"OS X":{"filesize":19},"Linux":{"filesize":11}}},"sl":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"son":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"sq":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"sr":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"3.6.13":{"Windows":{"filesize":8.9},"OS X":{"filesize":21},"Linux":{"filesize":12}}},"sv-SE":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":8.1},"OS X":{"filesize":19},"Linux":{"filesize":9.9}},"3.6.13":{"Windows":{"filesize":8.1},"OS X":{"filesize":19},"Linux":{"filesize":9.9}}},"ta":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"ta-LK":{"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"te":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"th":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"tr":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"uk":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":8.2},"OS X":{"filesize":19},"Linux":{"filesize":10}}},"vi":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"3.6.13":{"Windows":{"filesize":7.9},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}},"zh-CN":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.5}}},"zh-TW":{"3.5.16":{"Windows":{"filesize":7.6},"OS X":{"filesize":17.4},"Linux":{"filesize":9.2}},"4.0b10":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}},"3.6.13":{"Windows":{"filesize":7.8},"OS X":{"filesize":19},"Linux":{"filesize":9.6}}}}
+\ No newline at end of file
+diff --git a/lib/product_details_json/firefox_versions.json b/lib/product_details_json/firefox_versions.json
+new file mode 100644
+index 0000000..86dc1c4
+--- /dev/null
++++ b/lib/product_details_json/firefox_versions.json
+@@ -0,0 +1 @@
++{"LATEST_FIREFOX_VERSION":"3.6.13","LATEST_FIREFOX_DEVEL_VERSION":"4.0b10","LATEST_FIREFOX_RELEASED_DEVEL_VERSION":"4.0b10","LATEST_FIREFOX_OLDER_VERSION":"3.5.16"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/languages.json b/lib/product_details_json/languages.json
+new file mode 100644
+index 0000000..9606d25
+--- /dev/null
++++ b/lib/product_details_json/languages.json
+@@ -0,0 +1 @@
++{"af":{"English":"Afrikaans","native":"Afrikaans"},"ak":{"English":"Akan","native":"Akan"},"ast":{"English":"Asturian","native":"Asturianu"},"ar":{"English":"Arabic","native":"\u0639\u0631\u0628\u064a"},"as":{"English":"Assamese","native":"\u0985\u09b8\u09ae\u09c0\u09af\u09bc\u09be"},"be":{"English":"Belarusian","native":"\u0411\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f"},"bg":{"English":"Bulgarian","native":"\u0411\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438"},"bn-BD":{"English":"Bengali (Bangladesh)","native":"\u09ac\u09be\u0982\u09b2\u09be (\u09ac\u09be\u0982\u09b2\u09be\u09a6\u09c7\u09b6)"},"bn-IN":{"English":"Bengali (India)","native":"\u09ac\u09be\u0982\u09b2\u09be (\u09ad\u09be\u09b0\u09a4)"},"br":{"English":"Breton","native":"Brezhoneg"},"ca":{"English":"Catalan","native":"catal\u00e0"},"ca-valencia":{"English":"Catalan (Valencian)","native":"catal\u00e0 (valenci\u00e0)"},"cs":{"English":"Czech","native":"\u010ce\u0161tina"},"cy":{"English":"Welsh","native":"Cymraeg"},"da":{"English":"Danish","native":"Dansk"},"de":{"English":"German","native":"Deutsch"},"de-AT":{"English":"German (Austria)","native":"Deutsch (\u00d6sterreich)"},"de-CH":{"English":"German (Switzerland)","native":"Deutsch (Schweiz)"},"de-DE":{"English":"German (Germany)","native":"Deutsch (Deutschland)"},"dsb":{"English":"Lower Sorbian","native":"Dolnoserb\u0161\u0107ina"},"el":{"English":"Greek","native":"\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac"},"en-AU":{"English":"English (Australian)","native":"English (Australian)"},"en-CA":{"English":"English (Canadian)","native":"English (Canadian)"},"en-GB":{"English":"English (British)","native":"English (British)"},"en-NZ":{"English":"English (New Zealand)","native":"English (New Zealand)"},"en-US":{"English":"English (US)","native":"English (US)"},"en-ZA":{"English":"English (South African)","native":"English (South African)"},"eo":{"English":"Esperanto","native":"Esperanto"},"es":{"English":"Spanish","native":"Espa\u00f1ol"},"es-AR":{"English":"Spanish (Argentina)","native":"Espa\u00f1ol (de Argentina)"},"es-CL":{"English":"Spanish (Chile)","native":"Espa\u00f1ol (de Chile)"},"es-ES":{"English":"Spanish (Spain)","native":"Espa\u00f1ol (de Espa\u00f1a)"},"es-MX":{"English":"Spanish (Mexico)","native":"Espa\u00f1ol (de M\u00e9xico)"},"et":{"English":"Estonian","native":"Eesti keel"},"eu":{"English":"Basque","native":"Euskara"},"fa":{"English":"Persian","native":"\u0641\u0627\u0631\u0633\u06cc"},"fi":{"English":"Finnish","native":"suomi"},"fj-FJ":{"English":"Fijian","native":"Vosa vaka-Viti"},"fr":{"English":"French","native":"Fran\u00e7ais"},"fur-IT":{"English":"Friulian","native":"Furlan"},"fy-NL":{"English":"Frisian","native":"Frysk"},"ga":{"English":"Irish","native":"Gaeilge"},"ga-IE":{"English":"Irish (Ireland)","native":"Gaeilge (\u00c9ire)"},"gd":{"English":"Gaelic (Scotland)","native":"G\u00e0idhlig"},"gl":{"English":"Galician","native":"Galego"},"gu-IN":{"English":"Gujarati","native":"\u0a97\u0ac1\u0a9c\u0ab0\u0abe\u0aa4\u0ac0"},"he":{"English":"Hebrew","native":"\u05e2\u05d1\u05e8\u05d9\u05ea"},"hi":{"English":"Hindi","native":"\u0939\u093f\u0928\u094d\u0926\u0940"},"hi-IN":{"English":"Hindi (India)","native":"\u0939\u093f\u0928\u094d\u0926\u0940 (\u092d\u093e\u0930\u0924)"},"hr":{"English":"Croatian","native":"Hrvatski"},"hsb":{"English":"Upper Sorbian","native":"Hornjoserbsce"},"hu":{"English":"Hungarian","native":"Magyar"},"hy-AM":{"English":"Armenian","native":"\u0540\u0561\u0575\u0565\u0580\u0565\u0576"},"id":{"English":"Indonesian","native":"Bahasa Indonesia"},"is":{"English":"Icelandic","native":"\u00edslenska"},"it":{"English":"Italian","native":"Italiano"},"ja":{"English":"Japanese","native":"\u65e5\u672c\u8a9e"},"ja-JP-mac":{"English":"Japanese","native":"\u65e5\u672c\u8a9e"},"ka":{"English":"Georgian","native":"\u10e5\u10d0\u10e0\u10d7\u10e3\u10da\u10d8"},"kk":{"English":"Kazakh","native":"\u049a\u0430\u0437\u0430\u049b"},"kn":{"English":"Kannada","native":"\u0c95\u0ca8\u0ccd\u0ca8\u0ca1"},"ko":{"English":"Korean","native":"\ud55c\uad6d\uc5b4"},"ku":{"English":"Kurdish","native":"Kurd\u00ee"},"la":{"English":"Latin","native":"Latina"},"lg":{"English":"Luganda","native":"Luganda"},"lt":{"English":"Lithuanian","native":"lietuvi\u0173 kalba"},"lv":{"English":"Latvian","native":"Latvie\u0161u"},"mai":{"English":"Maithili","native":"\u092e\u0948\u0925\u093f\u0932\u0940 \u09ae\u09c8\u09a5\u09bf\u09b2\u09c0"},"mg":{"English":"Malagasy","native":"Malagasy"},"mi":{"English":"Maori (Aotearoa)","native":"M\u0101ori (Aotearoa)"},"mk":{"English":"Macedonian","native":"\u041c\u0430\u043a\u0435\u0434\u043e\u043d\u0441\u043a\u0438"},"ml":{"English":"Malayalam","native":"\u0d2e\u0d32\u0d2f\u0d3e\u0d33\u0d02"},"mn":{"English":"Mongolian","native":"\u041c\u043e\u043d\u0433\u043e\u043b"},"mr":{"English":"Marathi","native":"\u092e\u0930\u093e\u0920\u0940"},"nb-NO":{"English":"Norwegian (Bokm\u00e5l)","native":"Norsk bokm\u00e5l"},"ne-NP":{"English":"Nepali","native":"\u0928\u0947\u092a\u093e\u0932\u0940"},"nn-NO":{"English":"Norwegian (Nynorsk)","native":"Norsk nynorsk"},"nl":{"English":"Dutch","native":"Nederlands"},"nr":{"English":"Ndebele, South","native":"isiNdebele"},"nso":{"English":"Northern Sotho","native":"Sepedi"},"oc":{"English":"Occitan (Lengadocian)","native":"occitan (lengadocian)"},"or":{"English":"Oriya","native":"\u0b13\u0b21\u0b3c\u0b3f\u0b06"},"pa-IN":{"English":"Punjabi","native":"\u0a2a\u0a70\u0a1c\u0a3e\u0a2c\u0a40"},"pl":{"English":"Polish","native":"Polski"},"pt-BR":{"English":"Portuguese (Brazilian)","native":"Portugu\u00eas (do Brasil)"},"pt-PT":{"English":"Portuguese (Portugal)","native":"Portugu\u00eas (Europeu)"},"ro":{"English":"Romanian","native":"rom\u00e2n\u0103"},"rm":{"English":"Romansh","native":"rumantsch"},"ru":{"English":"Russian","native":"\u0420\u0443\u0441\u0441\u043a\u0438\u0439"},"rw":{"English":"Kinyarwanda","native":"Ikinyarwanda"},"si":{"English":"Sinhala","native":"\u0dc3\u0dd2\u0d82\u0dc4\u0dbd"},"sk":{"English":"Slovak","native":"sloven\u010dina"},"sl":{"English":"Slovenian","native":"slovensko"},"son":{"English":"Songhai","native":"So\u014bay"},"sq":{"English":"Albanian","native":"Shqip"},"sr":{"English":"Serbian","native":"\u0421\u0440\u043f\u0441\u043a\u0438"},"sr-Latn":{"English":"Serbian","native":"Srpski"},"ss":{"English":"Siswati","native":"siSwati"},"st":{"English":"Southern Sotho","native":"Sesotho"},"sv-SE":{"English":"Swedish","native":"Svenska"},"ta":{"English":"Tamil","native":"\u0ba4\u0bae\u0bbf\u0bb4\u0bcd"},"ta-IN":{"English":"Tamil (India)","native":"\u0ba4\u0bae\u0bbf\u0bb4\u0bcd (\u0b87\u0ba8\u0bcd\u0ba4\u0bbf\u0baf\u0bbe)"},"ta-LK":{"English":"Tamil (Sri Lanka)","native":"\u0ba4\u0bae\u0bbf\u0bb4\u0bcd (\u0b87\u0bb2\u0b99\u0bcd\u0b95\u0bc8)"},"te":{"English":"Telugu","native":"\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41"},"th":{"English":"Thai","native":"\u0e44\u0e17\u0e22"},"tn":{"English":"Tswana","native":"Setswana"},"tr":{"English":"Turkish","native":"T\u00fcrk\u00e7e"},"ts":{"English":"Tsonga","native":"Xitsonga"},"tt-RU":{"English":"Tatar","native":"Tatar\u00e7a"},"uk":{"English":"Ukrainian","native":"\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430"},"ur":{"English":"Urdu","native":"\u0627\u064f\u0631\u062f\u0648"},"ve":{"English":"Venda","native":"Tshiven\u1e13a"},"vi":{"English":"Vietnamese","native":"Ti\u1ebfng Vi\u1ec7t"},"wo":{"English":"Wolof","native":"Wolof"},"xh":{"English":"Xhosa","native":"isiXhosa"},"zh-CN":{"English":"Chinese (Simplified)","native":"\u4e2d\u6587 (\u7b80\u4f53)"},"zh-TW":{"English":"Chinese (Traditional)","native":"\u6b63\u9ad4\u4e2d\u6587 (\u7e41\u9ad4)"},"zu":{"English":"Zulu","native":"isiZulu"}}
+\ No newline at end of file
+diff --git a/lib/product_details_json/mobile_details.json b/lib/product_details_json/mobile_details.json
+new file mode 100644
+index 0000000..d6262b7
+--- /dev/null
++++ b/lib/product_details_json/mobile_details.json
+@@ -0,0 +1 @@
++{"version":"1.1","beta_version":"4.0b3","builds":[{"locale":{"code":"ar","english":"Arabic","native":"\u0639\u0631\u0628\u064a"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=ar","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"be","english":"Belarusian","native":"\u0411\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=be","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"ca","english":"Catalan","native":"catal\u00e0"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=ca","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"cs","english":"Czech","native":"\u010ce\u0161tina"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"da","english":"Danish","native":"Dansk"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"de","english":"German","native":"Deutsch"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"el","english":"Greek","native":"\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=el","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"en-US","english":"English (US)","native":"English (US)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"es-AR","english":"Spanish (Argentina)","native":"Espa\u00f1ol (de Argentina)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=es-AR","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"es-ES","english":"Spanish (Spain)","native":"Espa\u00f1ol (de Espa\u00f1a)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"eu","english":"Basque","native":"Euskara"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=eu","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"fa","english":"Persian","native":"\u0641\u0627\u0631\u0633\u06cc"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=fa","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"fi","english":"Finnish","native":"suomi"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"fr","english":"French","native":"Fran\u00e7ais"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"fy-NL","english":"Frisian","native":"Frysk"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=fy-NL","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"ga-IE","english":"Irish (Ireland)","native":"Gaeilge (\u00c9ire)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=ga-IE","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"gl","english":"Galician","native":"Galego"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=gl","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"hu","english":"Hungarian","native":"Magyar"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=hu","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"it","english":"Italian","native":"Italiano"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"ja","english":"Japanese","native":"\u65e5\u672c\u8a9e"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=ja","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"lt","english":"Lithuanian","native":"lietuvi\u0173 kalba"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=lt","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"nb-NO","english":"Norwegian (Bokm\u00e5l)","native":"Norsk bokm\u00e5l"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"nl","english":"Dutch","native":"Nederlands"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"nn-NO","english":"Norwegian (Nynorsk)","native":"Norsk nynorsk"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=nn-NO","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"pa-IN","english":"Punjabi","native":"\u0a2a\u0a70\u0a1c\u0a3e\u0a2c\u0a40"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=pa-IN","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"pl","english":"Polish","native":"Polski"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"pt-BR","english":"Portuguese (Brazilian)","native":"Portugu\u00eas (do Brasil)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=pt-BR","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"pt-PT","english":"Portuguese (Portugal)","native":"Portugu\u00eas (Europeu)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"ro","english":"Romanian","native":"rom\u00e2n\u0103"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=ro","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"ru","english":"Russian","native":"\u0420\u0443\u0441\u0441\u043a\u0438\u0439"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=multi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"sk","english":"Slovak","native":"sloven\u010dina"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=sk","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"sl","english":"Slovenian","native":"slovensko"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=sl","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"sr","english":"Serbian","native":"\u0421\u0440\u043f\u0441\u043a\u0438"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=sr","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"tr","english":"Turkish","native":"T\u00fcrk\u00e7e"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=tr","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"uk","english":"Ukrainian","native":"\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=uk","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"vi","english":"Vietnamese","native":"Ti\u1ebfng Vi\u1ec7t"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=vi","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"zh-CN","english":"Chinese (Simplified)","native":"\u4e2d\u6587 (\u7b80\u4f53)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=zh-CN","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}},{"locale":{"code":"zh-TW","english":"Chinese (Traditional)","native":"\u6b63\u9ad4\u4e2d\u6587 (\u7e41\u9ad4)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-1.1&os=maemo&lang=zh-TW","win32":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/win32-i686\/fennec-4.0b3.en-US.win32.zip","mac":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/macosx-i686\/fennec-4.0b3.en-US.mac.dmg","linux-i686":"http:\/\/ftp.mozilla.org\/pub\/mozilla.org\/mobile\/releases\/4.0b3\/linux-i686\/fennec-4.0b3.en-US.linux-i686.tar.bz2"}}],"beta_builds":[{"locale":{"code":"cs","english":"Czech","native":"\u010ce\u0161tina"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"en-US","english":"English (US)","native":"English (US)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"es-ES","english":"Spanish (Spain)","native":"Espa\u00f1ol (de Espa\u00f1a)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"fi","english":"Finnish","native":"suomi"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"it","english":"Italian","native":"Italiano"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"nb-NO","english":"Norwegian (Bokm\u00e5l)","native":"Norsk bokm\u00e5l"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"nl","english":"Dutch","native":"Nederlands"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"pl","english":"Polish","native":"Polski"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"pt-PT","english":"Portuguese (Portugal)","native":"Portugu\u00eas (Europeu)"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}},{"locale":{"code":"ru","english":"Russian","native":"\u0420\u0443\u0441\u0441\u043a\u0438\u0439"},"download":{"maemo":"http:\/\/download.mozilla.org\/?product=firefox-mobile-4.0b3&os=maemo&lang=multi","android":"market:\/\/details?id=org.mozilla.firefox"}}]}
+\ No newline at end of file
+diff --git a/lib/product_details_json/mobile_history_development_releases.json b/lib/product_details_json/mobile_history_development_releases.json
+new file mode 100644
+index 0000000..03fb0d1
+--- /dev/null
++++ b/lib/product_details_json/mobile_history_development_releases.json
+@@ -0,0 +1 @@
++{"1.1b1":"2010-04-28","1.1rc1":"2010-06-16","4.0b1":"2010-10-06","4.0b2":"2010-11-04","4.0b3":"2010-12-22"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/mobile_history_major_releases.json b/lib/product_details_json/mobile_history_major_releases.json
+new file mode 100644
+index 0000000..dde77cc
+--- /dev/null
++++ b/lib/product_details_json/mobile_history_major_releases.json
+@@ -0,0 +1 @@
++{"1.0":"2010-01-28","1.1":"2010-07-01"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/mobile_history_stability_releases.json b/lib/product_details_json/mobile_history_stability_releases.json
+new file mode 100644
+index 0000000..a083f2f
+--- /dev/null
++++ b/lib/product_details_json/mobile_history_stability_releases.json
+@@ -0,0 +1 @@
++{"1.0.1":"2010-04-13"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/thunderbird_beta_builds.json b/lib/product_details_json/thunderbird_beta_builds.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/lib/product_details_json/thunderbird_beta_builds.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/lib/product_details_json/thunderbird_history_development_releases.json b/lib/product_details_json/thunderbird_history_development_releases.json
+new file mode 100644
+index 0000000..babfc74
+--- /dev/null
++++ b/lib/product_details_json/thunderbird_history_development_releases.json
+@@ -0,0 +1 @@
++{"1.0rc1":"2004-12-01","1.5b1":"2005-09-09","1.5b2":"2005-10-07","1.5rc1":"2005-11-05","1.5rc2":"2005-12-21","2.0b1":"2006-12-12","2.0b2":"2007-01-23","2.0rc1":"2007-04-06","3.0a1":"2008-05-12","3.0a2":"2008-07-13","3.0a3":"2008-10-14","3.0b1":"2008-12-09","3.0b2":"2009-02-26","3.0b3":"2009-07-21","3.0b4":"2009-10-22","3.0rc1":"2009-11-24","3.0rc2":"2009-12-01","3.1a1":"2010-02-03","3.1b1":"2010-03-10","3.1rc1":"2010-05-27","3.1rc2":"2010-06-09"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/thunderbird_history_major_releases.json b/lib/product_details_json/thunderbird_history_major_releases.json
+new file mode 100644
+index 0000000..e0fe9fe
+--- /dev/null
++++ b/lib/product_details_json/thunderbird_history_major_releases.json
+@@ -0,0 +1 @@
++{"1.0":"2004-12-07","1.5":"2006-01-11","2.0":"2007-04-18","3.0":"2009-12-08","3.1":"2010-06-24"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/thunderbird_history_stability_releases.json b/lib/product_details_json/thunderbird_history_stability_releases.json
+new file mode 100644
+index 0000000..2104fbf
+--- /dev/null
++++ b/lib/product_details_json/thunderbird_history_stability_releases.json
+@@ -0,0 +1 @@
++{"1.0.2":"2005-03-21","1.0.5":"2005-07-13","1.0.6":"2005-07-19","1.0.7":"2005-09-29","1.0.8":"2006-04-21","1.5.0.2":"2006-04-21","1.5.0.4":"2006-06-01","1.5.0.5":"2006-07-27","1.5.0.7":"2006-09-14","1.5.0.8":"2006-11-08","1.5.0.9":"2006-12-19","1.5.0.10":"2007-03-01","1.5.0.12":"2007-05-30","1.5.0.13":"2007-08-23","2.0.0.4":"2007-06-14","2.0.0.5":"2007-07-19","2.0.0.6":"2007-08-01","2.0.0.9":"2007-11-14","2.0.0.12":"2008-02-26","2.0.0.14":"2008-05-01","2.0.0.16":"2008-07-23","2.0.0.17":"2008-09-25","2.0.0.18":"2008-11-19","2.0.0.19":"2008-12-30","2.0.0.21":"2009-03-18","2.0.0.22":"2009-06-22","2.0.0.23":"2009-08-20","2.0.0.24":"2010-03-16","3.0.1":"2010-01-20","3.0.2":"2010-02-25","3.0.3":"2010-03-01","3.0.4":"2010-03-30","3.0.5":"2010-06-17","3.0.6":"2010-07-20","3.0.7":"2010-09-07","3.0.8":"2010-09-16","3.0.9":"2010-10-19","3.0.10":"2010-10-27","3.1.1":"2010-07-20","3.1.2":"2010-08-05","3.1.3":"2010-09-07","3.1.4":"2010-09-16","3.1.5":"2010-10-19","3.1.6":"2010-10-27"}
+\ No newline at end of file
+diff --git a/lib/product_details_json/thunderbird_primary_builds.json b/lib/product_details_json/thunderbird_primary_builds.json
+new file mode 100644
+index 0000000..3b0fc35
+--- /dev/null
++++ b/lib/product_details_json/thunderbird_primary_builds.json
+@@ -0,0 +1 @@
++{"af":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"ar":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"be":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.2},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.7}}},"bg":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"bn-BD":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"ca":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"cs":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"da":{"3.0.11":{"Windows":{"filesize":8.9},"OS X":{"filesize":19.8},"Linux":{"filesize":10.8}},"3.1.7":{"Windows":{"filesize":9.3},"OS X":{"filesize":21},"Linux":{"filesize":11.3}}},"de":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"el":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"en-GB":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"en-US":{"3.0.11":{"Windows":{"filesize":8.6},"OS X":{"filesize":19.5},"Linux":{"filesize":10.5}},"3.1.7":{"Windows":{"filesize":9},"OS X":{"filesize":20.6},"Linux":{"filesize":11}}},"es-AR":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"es-ES":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.2},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.8},"OS X":{"filesize":20.4},"Linux":{"filesize":10.7}}},"et":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"eu":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"fi":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"fr":{"3.0.11":{"Windows":{"filesize":8.7},"OS X":{"filesize":19.5},"Linux":{"filesize":10.5}},"3.1.7":{"Windows":{"filesize":9.1},"OS X":{"filesize":20.7},"Linux":{"filesize":11}}},"fy-NL":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"ga-IE":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"gd":{"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"gl":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"he":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.2},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"hu":{"3.0.11":{"Windows":{"filesize":9},"OS X":{"filesize":19.9},"Linux":{"filesize":10.9}},"3.1.7":{"Windows":{"filesize":9.4},"OS X":{"filesize":21.1},"Linux":{"filesize":11.4}}},"id":{"3.0.11":{"Windows":{"filesize":8.6},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.5},"Linux":{"filesize":10.9}}},"is":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"it":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.2},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.8},"OS X":{"filesize":20.4},"Linux":{"filesize":10.7}}},"ja":{"3.0.11":{"Windows":{"filesize":8.7},"OS X":{"filesize":19.5},"Linux":{"filesize":10.5}},"3.1.7":{"Windows":{"filesize":9},"OS X":{"filesize":20.7},"Linux":{"filesize":11}}},"ka":{"3.0.11":{"Windows":{"filesize":8.7},"OS X":{"filesize":19.5},"Linux":{"filesize":10.5}}},"ko":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.2},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"lt":{"3.0.11":{"Windows":{"filesize":8.8},"OS X":{"filesize":19.6},"Linux":{"filesize":10.6}},"3.1.7":{"Windows":{"filesize":9.2},"OS X":{"filesize":20.8},"Linux":{"filesize":11.1}}},"nb-NO":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"nl":{"3.0.11":{"Windows":{"filesize":9.3},"OS X":{"filesize":20.1},"Linux":{"filesize":11}},"3.1.7":{"Windows":{"filesize":9.7},"OS X":{"filesize":21.3},"Linux":{"filesize":11.6}}},"nn-NO":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"pa-IN":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"pl":{"3.0.11":{"Windows":{"filesize":9.3},"OS X":{"filesize":20.2},"Linux":{"filesize":11.3}},"3.1.7":{"Windows":{"filesize":9.7},"OS X":{"filesize":21.4},"Linux":{"filesize":11.8}}},"pt-BR":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"pt-PT":{"3.0.11":{"Windows":{"filesize":8.7},"OS X":{"filesize":19.4},"Linux":{"filesize":10.4}},"3.1.7":{"Windows":{"filesize":9},"OS X":{"filesize":20.6},"Linux":{"filesize":11}}},"ro":{"3.0.11":{"Windows":{"filesize":8.9},"OS X":{"filesize":19.8},"Linux":{"filesize":10.8}},"3.1.7":{"Windows":{"filesize":9.3},"OS X":{"filesize":21},"Linux":{"filesize":11.3}}},"ru":{"3.0.11":{"Windows":{"filesize":8.9},"OS X":{"filesize":19.7},"Linux":{"filesize":10.7}},"3.1.7":{"Windows":{"filesize":9.3},"OS X":{"filesize":20.9},"Linux":{"filesize":11.2}}},"si":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"sk":{"3.0.11":{"Windows":{"filesize":9},"OS X":{"filesize":19.8},"Linux":{"filesize":10.8}},"3.1.7":{"Windows":{"filesize":9.3},"OS X":{"filesize":21},"Linux":{"filesize":11.4}}},"sl":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"sq":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"sr":{"3.0.11":{"Windows":{"filesize":9.6},"OS X":{"filesize":20.9},"Linux":{"filesize":12.1}},"3.1.7":{"Windows":{"filesize":10},"OS X":{"filesize":22.1},"Linux":{"filesize":12.6}}},"sv-SE":{"3.0.11":{"Windows":{"filesize":8.7},"OS X":{"filesize":19.6},"Linux":{"filesize":10.6}},"3.1.7":{"Windows":{"filesize":9.1},"OS X":{"filesize":20.8},"Linux":{"filesize":11.1}}},"ta-LK":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}}},"tr":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"uk":{"3.0.11":{"Windows":{"filesize":8.9},"OS X":{"filesize":19.7},"Linux":{"filesize":10.7}},"3.1.7":{"Windows":{"filesize":9.3},"OS X":{"filesize":20.8},"Linux":{"filesize":11.2}}},"vi":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.3}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.5},"Linux":{"filesize":10.8}}},"zh-CN":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.2},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}},"zh-TW":{"3.0.11":{"Windows":{"filesize":8.5},"OS X":{"filesize":19.3},"Linux":{"filesize":10.2}},"3.1.7":{"Windows":{"filesize":8.9},"OS X":{"filesize":20.4},"Linux":{"filesize":10.8}}}}
+\ No newline at end of file
+diff --git a/lib/product_details_json/thunderbird_versions.json b/lib/product_details_json/thunderbird_versions.json
+new file mode 100644
+index 0000000..718cca2
+--- /dev/null
++++ b/lib/product_details_json/thunderbird_versions.json
+@@ -0,0 +1 @@
++{"LATEST_THUNDERBIRD_VERSION":"3.1.7","LATEST_THUNDERBIRD__OLDER_VERSION":"3.0.11"}
+\ No newline at end of file
+diff --git a/media/css/base.css b/media/css/base.css
+index 5ca20fa..fa600e2 100644
+--- a/media/css/base.css
++++ b/media/css/base.css
+@@ -137,10 +137,6 @@ footer p, #main p {
+     font-weight: 300;
+ }
+ 
+-.welcome p {
+-    margin-top: 30px;
+-}
+-
+ #header h1 a,#header h1 span {
+     color:#fff;
+     font-family:MetaBold, 'Trebuchet MS', Helvetica, Arial, "DejaVu Sans", sans-serif;
+@@ -368,17 +364,12 @@ a.btn {
+     margin:18px 20px;
+ }
+ 
+-.search-page .result a {
+-    width: 340px;
+-    height: 75px;
+-    margin-bottom: 25px;
+-}
+-
+-.search-page .result .avatar img {
++.search-page .result .avatar {
+     float:left;
+     height:70px;
+     width:70px;
+-    margin: 0 15px 0 0;
++    text-align:center;
++    margin:0 10px 0 35px;
+ }
+ 
+ .avatar .profile-photo {
+@@ -391,22 +382,13 @@ a.btn {
+ }
+ 
+ .search-page .result h2 {
+-    font-size:20px;
++    font-size:16px;
+     margin:0;
+-    width: 220px;
+-    white-space: nowrap;
+-    overflow: hidden;
+-    text-overflow: ellipsis;
+ }
+ 
+-.details ul {
+-    font-size: 12px;
+-    list-style: none;
+-    text-align: left;
+-    width: 220px;
+-    white-space: nowrap;
+-    overflow: hidden;
+-    text-overflow: ellipsis;
++.search-page .result h3 {
++    font-size:16px;
++    margin:0;
+ }
+ 
+ .clear {
+@@ -469,12 +451,6 @@ legend {
+     width: 210px;
+ }
+ 
+-.tab-content h2 {
+-    border-bottom: 1px solid #000;
+-    margin-bottom: 6px;
+-    padding-bottom: 3px;
+-}
+-
+ .tab-content .field_description {
+     margin-bottom: 20px;
+ }
+@@ -569,21 +545,3 @@ footer div.container {
+ label, input, button, select, textarea {
+     font-family:'Open Sans', "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+ }
+-
+-/* Micro-clearfix */
+-.location:before,
+-.location:after {
+-    content: "";
+-    display: table;
+-}
+-
+-.location:after {
+-    clear: both;
+-}
+-
+-/* TODO: Add rtl support here. */
+-.location div {
+-    float: left;
+-    width: 33%;
+-    margin: 0;
+-}
+diff --git a/media/css/prettify.css b/media/css/prettify.css
+deleted file mode 100644
+index 400fd74..0000000
+--- a/media/css/prettify.css
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/* Pretty printing styles. Used with prettify.js. */
+-
+-/* SPAN elements with the classes below are added by prettyprint. */
+-.pln { color: #000 }  /* plain text */
+-
+-@media screen {
+-  .str { color: #080 }  /* string content */
+-  .kwd { color: #008 }  /* a keyword */
+-  .com { color: #800 }  /* a comment */
+-  .typ { color: #606 }  /* a type name */
+-  .lit { color: #066 }  /* a literal value */
+-  /* punctuation, lisp open bracket, lisp close bracket */
+-  .pun, .opn, .clo { color: #660 }
+-  .tag { color: #008 }  /* a markup tag name */
+-  .atn { color: #606 }  /* a markup attribute name */
+-  .atv { color: #080 }  /* a markup attribute value */
+-  .dec, .var { color: #606 }  /* a declaration; a variable name */
+-  .fun { color: red }  /* a function name */
+-}
+-
+-/* Use higher contrast and text-weight for printable form. */
+-@media print, projection {
+-  .str { color: #060 }
+-  .kwd { color: #006; font-weight: bold }
+-  .com { color: #600; font-style: italic }
+-  .typ { color: #404; font-weight: bold }
+-  .lit { color: #044 }
+-  .pun, .opn, .clo { color: #440 }
+-  .tag { color: #006; font-weight: bold }
+-  .atn { color: #404 }
+-  .atv { color: #060 }
+-}
+-
+-/* Put a border around prettyprinted code snippets. */
+-pre.prettyprint { padding: 2px; border: 1px solid #888 }
+-
+-/* Specify class=linenums on a pre to get line numbering */
+-ol.linenums { margin-top: 0; margin-bottom: 0 } /* IE indents via margin-left */
+-li.L0,
+-li.L1,
+-li.L2,
+-li.L3,
+-li.L5,
+-li.L6,
+-li.L7,
+-li.L8 { list-style-type: none }
+-/* Alternate shading for lines */
+-li.L1,
+-li.L3,
+-li.L5,
+-li.L7,
+-li.L9 { background: #eee }
+diff --git a/media/css/user.css b/media/css/user.css
+deleted file mode 100644
+index 730508d..0000000
+--- a/media/css/user.css
++++ /dev/null
+@@ -1,4 +0,0 @@
+-.control-group h2 {
+-  border-bottom: 1px solid black;
+-  margin-bottom: 10px;
+-}
+diff --git a/media/js/api.js b/media/js/api.js
+deleted file mode 100644
+index 00e5207..0000000
+--- a/media/js/api.js
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/*
+- * Api specific javascript
+- */
+-
+-$(function(){
+-
+-    var queryParameters = {}, queryString = location.search.substring(1), re = /([^&=]+)=([^&]*)/g, m;
+-    while (m = re.exec(queryString)) {
+-        queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+-    };
+-    queryParameters['format'] = 'json';
+-    $.ajax({
+-        url: window.location.pathname,
+-        data: queryParameters
+-    }).done(function(msg) {
+-        $("#json").html(JSON.stringify(msg, undefined, 2));
+-        $("#json_url").attr("href", this.url).html(this.url);
+-        prettyPrint();
+-    });
+-})
+diff --git a/media/js/libs/prettify.js b/media/js/libs/prettify.js
+deleted file mode 100644
+index c70e952..0000000
+--- a/media/js/libs/prettify.js
++++ /dev/null
+@@ -1,1536 +0,0 @@
+-// Copyright (C) 2006 Google Inc.
+-//
+-// Licensed under the Apache License, Version 2.0 (the "License");
+-// you may not use this file except in compliance with the License.
+-// You may obtain a copy of the License at
+-//
+-//      http://www.apache.org/licenses/LICENSE-2.0
+-//
+-// Unless required by applicable law or agreed to in writing, software
+-// distributed under the License is distributed on an "AS IS" BASIS,
+-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-// See the License for the specific language governing permissions and
+-// limitations under the License.
+-
+-
+-/**
+- * @fileoverview
+- * some functions for browser-side pretty printing of code contained in html.
+- *
+- * <p>
+- * For a fairly comprehensive set of languages see the
+- * <a href="http://google-code-prettify.googlecode.com/svn/trunk/README.html#langs">README</a>
+- * file that came with this source.  At a minimum, the lexer should work on a
+- * number of languages including C and friends, Java, Python, Bash, SQL, HTML,
+- * XML, CSS, Javascript, and Makefiles.  It works passably on Ruby, PHP and Awk
+- * and a subset of Perl, but, because of commenting conventions, doesn't work on
+- * Smalltalk, Lisp-like, or CAML-like languages without an explicit lang class.
+- * <p>
+- * Usage: <ol>
+- * <li> include this source file in an html page via
+- *   {@code <script type="text/javascript" src="/path/to/prettify.js"></script>}
+- * <li> define style rules.  See the example page for examples.
+- * <li> mark the {@code <pre>} and {@code <code>} tags in your source with
+- *    {@code class=prettyprint.}
+- *    You can also use the (html deprecated) {@code <xmp>} tag, but the pretty
+- *    printer needs to do more substantial DOM manipulations to support that, so
+- *    some css styles may not be preserved.
+- * </ol>
+- * That's it.  I wanted to keep the API as simple as possible, so there's no
+- * need to specify which language the code is in, but if you wish, you can add
+- * another class to the {@code <pre>} or {@code <code>} element to specify the
+- * language, as in {@code <pre class="prettyprint lang-java">}.  Any class that
+- * starts with "lang-" followed by a file extension, specifies the file type.
+- * See the "lang-*.js" files in this directory for code that implements
+- * per-language file handlers.
+- * <p>
+- * Change log:<br>
+- * cbeust, 2006/08/22
+- * <blockquote>
+- *   Java annotations (start with "@") are now captured as literals ("lit")
+- * </blockquote>
+- * @requires console
+- */
+-
+-// JSLint declarations
+-/*global console, document, navigator, setTimeout, window, define */
+-
+-/**
+- * Split {@code prettyPrint} into multiple timeouts so as not to interfere with
+- * UI events.
+- * If set to {@code false}, {@code prettyPrint()} is synchronous.
+- */
+-window['PR_SHOULD_USE_CONTINUATION'] = true;
+-
+-/**
+- * Find all the {@code <pre>} and {@code <code>} tags in the DOM with
+- * {@code class=prettyprint} and prettify them.
+- *
+- * @param {Function?} opt_whenDone if specified, called when the last entry
+- *     has been finished.
+- */
+-var prettyPrintOne;
+-/**
+- * Pretty print a chunk of code.
+- *
+- * @param {string} sourceCodeHtml code as html
+- * @return {string} code as html, but prettier
+- */
+-var prettyPrint;
+-
+-
+-(function () {
+-  var win = window;
+-  // Keyword lists for various languages.
+-  // We use things that coerce to strings to make them compact when minified
+-  // and to defeat aggressive optimizers that fold large string constants.
+-  var FLOW_CONTROL_KEYWORDS = ["break,continue,do,else,for,if,return,while"];
+-  var C_KEYWORDS = [FLOW_CONTROL_KEYWORDS,"auto,case,char,const,default," + 
+-      "double,enum,extern,float,goto,int,long,register,short,signed,sizeof," +
+-      "static,struct,switch,typedef,union,unsigned,void,volatile"];
+-  var COMMON_KEYWORDS = [C_KEYWORDS,"catch,class,delete,false,import," +
+-      "new,operator,private,protected,public,this,throw,true,try,typeof"];
+-  var CPP_KEYWORDS = [COMMON_KEYWORDS,"alignof,align_union,asm,axiom,bool," +
+-      "concept,concept_map,const_cast,constexpr,decltype," +
+-      "dynamic_cast,explicit,export,friend,inline,late_check," +
+-      "mutable,namespace,nullptr,reinterpret_cast,static_assert,static_cast," +
+-      "template,typeid,typename,using,virtual,where"];
+-  var JAVA_KEYWORDS = [COMMON_KEYWORDS,
+-      "abstract,boolean,byte,extends,final,finally,implements,import," +
+-      "instanceof,null,native,package,strictfp,super,synchronized,throws," +
+-      "transient"];
+-  var CSHARP_KEYWORDS = [JAVA_KEYWORDS,
+-      "as,base,by,checked,decimal,delegate,descending,dynamic,event," +
+-      "fixed,foreach,from,group,implicit,in,interface,internal,into,is,let," +
+-      "lock,object,out,override,orderby,params,partial,readonly,ref,sbyte," +
+-      "sealed,stackalloc,string,select,uint,ulong,unchecked,unsafe,ushort," +
+-      "var,virtual,where"];
+-  var COFFEE_KEYWORDS = "all,and,by,catch,class,else,extends,false,finally," +
+-      "for,if,in,is,isnt,loop,new,no,not,null,of,off,on,or,return,super,then," +
+-      "throw,true,try,unless,until,when,while,yes";
+-  var JSCRIPT_KEYWORDS = [COMMON_KEYWORDS,
+-      "debugger,eval,export,function,get,null,set,undefined,var,with," +
+-      "Infinity,NaN"];
+-  var PERL_KEYWORDS = "caller,delete,die,do,dump,elsif,eval,exit,foreach,for," +
+-      "goto,if,import,last,local,my,next,no,our,print,package,redo,require," +
+-      "sub,undef,unless,until,use,wantarray,while,BEGIN,END";
+-  var PYTHON_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "and,as,assert,class,def,del," +
+-      "elif,except,exec,finally,from,global,import,in,is,lambda," +
+-      "nonlocal,not,or,pass,print,raise,try,with,yield," +
+-      "False,True,None"];
+-  var RUBY_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "alias,and,begin,case,class," +
+-      "def,defined,elsif,end,ensure,false,in,module,next,nil,not,or,redo," +
+-      "rescue,retry,self,super,then,true,undef,unless,until,when,yield," +
+-      "BEGIN,END"];
+-  var SH_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "case,done,elif,esac,eval,fi," +
+-      "function,in,local,set,then,until"];
+-  var ALL_KEYWORDS = [
+-      CPP_KEYWORDS, CSHARP_KEYWORDS, JSCRIPT_KEYWORDS, PERL_KEYWORDS +
+-      PYTHON_KEYWORDS, RUBY_KEYWORDS, SH_KEYWORDS];
+-  var C_TYPES = /^(DIR|FILE|vector|(de|priority_)?queue|list|stack|(const_)?iterator|(multi)?(set|map)|bitset|u?(int|float)\d*)\b/;
+-
+-  // token style names.  correspond to css classes
+-  /**
+-   * token style for a string literal
+-   * @const
+-   */
+-  var PR_STRING = 'str';
+-  /**
+-   * token style for a keyword
+-   * @const
+-   */
+-  var PR_KEYWORD = 'kwd';
+-  /**
+-   * token style for a comment
+-   * @const
+-   */
+-  var PR_COMMENT = 'com';
+-  /**
+-   * token style for a type
+-   * @const
+-   */
+-  var PR_TYPE = 'typ';
+-  /**
+-   * token style for a literal value.  e.g. 1, null, true.
+-   * @const
+-   */
+-  var PR_LITERAL = 'lit';
+-  /**
+-   * token style for a punctuation string.
+-   * @const
+-   */
+-  var PR_PUNCTUATION = 'pun';
+-  /**
+-   * token style for plain text.
+-   * @const
+-   */
+-  var PR_PLAIN = 'pln';
+-
+-  /**
+-   * token style for an sgml tag.
+-   * @const
+-   */
+-  var PR_TAG = 'tag';
+-  /**
+-   * token style for a markup declaration such as a DOCTYPE.
+-   * @const
+-   */
+-  var PR_DECLARATION = 'dec';
+-  /**
+-   * token style for embedded source.
+-   * @const
+-   */
+-  var PR_SOURCE = 'src';
+-  /**
+-   * token style for an sgml attribute name.
+-   * @const
+-   */
+-  var PR_ATTRIB_NAME = 'atn';
+-  /**
+-   * token style for an sgml attribute value.
+-   * @const
+-   */
+-  var PR_ATTRIB_VALUE = 'atv';
+-
+-  /**
+-   * A class that indicates a section of markup that is not code, e.g. to allow
+-   * embedding of line numbers within code listings.
+-   * @const
+-   */
+-  var PR_NOCODE = 'nocode';
+-
+-
+-
+-/**
+- * A set of tokens that can precede a regular expression literal in
+- * javascript
+- * http://web.archive.org/web/20070717142515/http://www.mozilla.org/js/language/js20/rationale/syntax.html
+- * has the full list, but I've removed ones that might be problematic when
+- * seen in languages that don't support regular expression literals.
+- *
+- * <p>Specifically, I've removed any keywords that can't precede a regexp
+- * literal in a syntactically legal javascript program, and I've removed the
+- * "in" keyword since it's not a keyword in many languages, and might be used
+- * as a count of inches.
+- *
+- * <p>The link above does not accurately describe EcmaScript rules since
+- * it fails to distinguish between (a=++/b/i) and (a++/b/i) but it works
+- * very well in practice.
+- *
+- * @private
+- * @const
+- */
+-var REGEXP_PRECEDER_PATTERN = '(?:^^\\.?|[+-]|[!=]=?=?|\\#|%=?|&&?=?|\\(|\\*=?|[+\\-]=|->|\\/=?|::?|<<?=?|>>?>?=?|,|;|\\?|@|\\[|~|{|\\^\\^?=?|\\|\\|?=?|break|case|continue|delete|do|else|finally|instanceof|return|throw|try|typeof)\\s*';
+-
+-// CAVEAT: this does not properly handle the case where a regular
+-// expression immediately follows another since a regular expression may
+-// have flags for case-sensitivity and the like.  Having regexp tokens
+-// adjacent is not valid in any language I'm aware of, so I'm punting.
+-// TODO: maybe style special characters inside a regexp as punctuation.
+-
+-
+-  /**
+-   * Given a group of {@link RegExp}s, returns a {@code RegExp} that globally
+-   * matches the union of the sets of strings matched by the input RegExp.
+-   * Since it matches globally, if the input strings have a start-of-input
+-   * anchor (/^.../), it is ignored for the purposes of unioning.
+-   * @param {Array.<RegExp>} regexs non multiline, non-global regexs.
+-   * @return {RegExp} a global regex.
+-   */
+-  function combinePrefixPatterns(regexs) {
+-    var capturedGroupIndex = 0;
+-  
+-    var needToFoldCase = false;
+-    var ignoreCase = false;
+-    for (var i = 0, n = regexs.length; i < n; ++i) {
+-      var regex = regexs[i];
+-      if (regex.ignoreCase) {
+-        ignoreCase = true;
+-      } else if (/[a-z]/i.test(regex.source.replace(
+-                     /\\u[0-9a-f]{4}|\\x[0-9a-f]{2}|\\[^ux]/gi, ''))) {
+-        needToFoldCase = true;
+-        ignoreCase = false;
+-        break;
+-      }
+-    }
+-  
+-    var escapeCharToCodeUnit = {
+-      'b': 8,
+-      't': 9,
+-      'n': 0xa,
+-      'v': 0xb,
+-      'f': 0xc,
+-      'r': 0xd
+-    };
+-  
+-    function decodeEscape(charsetPart) {
+-      var cc0 = charsetPart.charCodeAt(0);
+-      if (cc0 !== 92 /* \\ */) {
+-        return cc0;
+-      }
+-      var c1 = charsetPart.charAt(1);
+-      cc0 = escapeCharToCodeUnit[c1];
+-      if (cc0) {
+-        return cc0;
+-      } else if ('0' <= c1 && c1 <= '7') {
+-        return parseInt(charsetPart.substring(1), 8);
+-      } else if (c1 === 'u' || c1 === 'x') {
+-        return parseInt(charsetPart.substring(2), 16);
+-      } else {
+-        return charsetPart.charCodeAt(1);
+-      }
+-    }
+-  
+-    function encodeEscape(charCode) {
+-      if (charCode < 0x20) {
+-        return (charCode < 0x10 ? '\\x0' : '\\x') + charCode.toString(16);
+-      }
+-      var ch = String.fromCharCode(charCode);
+-      return (ch === '\\' || ch === '-' || ch === ']' || ch === '^')
+-          ? "\\" + ch : ch;
+-    }
+-  
+-    function caseFoldCharset(charSet) {
+-      var charsetParts = charSet.substring(1, charSet.length - 1).match(
+-          new RegExp(
+-              '\\\\u[0-9A-Fa-f]{4}'
+-              + '|\\\\x[0-9A-Fa-f]{2}'
+-              + '|\\\\[0-3][0-7]{0,2}'
+-              + '|\\\\[0-7]{1,2}'
+-              + '|\\\\[\\s\\S]'
+-              + '|-'
+-              + '|[^-\\\\]',
+-              'g'));
+-      var ranges = [];
+-      var inverse = charsetParts[0] === '^';
+-  
+-      var out = ['['];
+-      if (inverse) { out.push('^'); }
+-  
+-      for (var i = inverse ? 1 : 0, n = charsetParts.length; i < n; ++i) {
+-        var p = charsetParts[i];
+-        if (/\\[bdsw]/i.test(p)) {  // Don't muck with named groups.
+-          out.push(p);
+-        } else {
+-          var start = decodeEscape(p);
+-          var end;
+-          if (i + 2 < n && '-' === charsetParts[i + 1]) {
+-            end = decodeEscape(charsetParts[i + 2]);
+-            i += 2;
+-          } else {
+-            end = start;
+-          }
+-          ranges.push([start, end]);
+-          // If the range might intersect letters, then expand it.
+-          // This case handling is too simplistic.
+-          // It does not deal with non-latin case folding.
+-          // It works for latin source code identifiers though.
+-          if (!(end < 65 || start > 122)) {
+-            if (!(end < 65 || start > 90)) {
+-              ranges.push([Math.max(65, start) | 32, Math.min(end, 90) | 32]);
+-            }
+-            if (!(end < 97 || start > 122)) {
+-              ranges.push([Math.max(97, start) & ~32, Math.min(end, 122) & ~32]);
+-            }
+-          }
+-        }
+-      }
+-  
+-      // [[1, 10], [3, 4], [8, 12], [14, 14], [16, 16], [17, 17]]
+-      // -> [[1, 12], [14, 14], [16, 17]]
+-      ranges.sort(function (a, b) { return (a[0] - b[0]) || (b[1]  - a[1]); });
+-      var consolidatedRanges = [];
+-      var lastRange = [];
+-      for (var i = 0; i < ranges.length; ++i) {
+-        var range = ranges[i];
+-        if (range[0] <= lastRange[1] + 1) {
+-          lastRange[1] = Math.max(lastRange[1], range[1]);
+-        } else {
+-          consolidatedRanges.push(lastRange = range);
+-        }
+-      }
+-  
+-      for (var i = 0; i < consolidatedRanges.length; ++i) {
+-        var range = consolidatedRanges[i];
+-        out.push(encodeEscape(range[0]));
+-        if (range[1] > range[0]) {
+-          if (range[1] + 1 > range[0]) { out.push('-'); }
+-          out.push(encodeEscape(range[1]));
+-        }
+-      }
+-      out.push(']');
+-      return out.join('');
+-    }
+-  
+-    function allowAnywhereFoldCaseAndRenumberGroups(regex) {
+-      // Split into character sets, escape sequences, punctuation strings
+-      // like ('(', '(?:', ')', '^'), and runs of characters that do not
+-      // include any of the above.
+-      var parts = regex.source.match(
+-          new RegExp(
+-              '(?:'
+-              + '\\[(?:[^\\x5C\\x5D]|\\\\[\\s\\S])*\\]'  // a character set
+-              + '|\\\\u[A-Fa-f0-9]{4}'  // a unicode escape
+-              + '|\\\\x[A-Fa-f0-9]{2}'  // a hex escape
+-              + '|\\\\[0-9]+'  // a back-reference or octal escape
+-              + '|\\\\[^ux0-9]'  // other escape sequence
+-              + '|\\(\\?[:!=]'  // start of a non-capturing group
+-              + '|[\\(\\)\\^]'  // start/end of a group, or line start
+-              + '|[^\\x5B\\x5C\\(\\)\\^]+'  // run of other characters
+-              + ')',
+-              'g'));
+-      var n = parts.length;
+-  
+-      // Maps captured group numbers to the number they will occupy in
+-      // the output or to -1 if that has not been determined, or to
+-      // undefined if they need not be capturing in the output.
+-      var capturedGroups = [];
+-  
+-      // Walk over and identify back references to build the capturedGroups
+-      // mapping.
+-      for (var i = 0, groupIndex = 0; i < n; ++i) {
+-        var p = parts[i];
+-        if (p === '(') {
+-          // groups are 1-indexed, so max group index is count of '('
+-          ++groupIndex;
+-        } else if ('\\' === p.charAt(0)) {
+-          var decimalValue = +p.substring(1);
+-          if (decimalValue) {
+-            if (decimalValue <= groupIndex) {
+-              capturedGroups[decimalValue] = -1;
+-            } else {
+-              // Replace with an unambiguous escape sequence so that
+-              // an octal escape sequence does not turn into a backreference
+-              // to a capturing group from an earlier regex.
+-              parts[i] = encodeEscape(decimalValue);
+-            }
+-          }
+-        }
+-      }
+-  
+-      // Renumber groups and reduce capturing groups to non-capturing groups
+-      // where possible.
+-      for (var i = 1; i < capturedGroups.length; ++i) {
+-        if (-1 === capturedGroups[i]) {
+-          capturedGroups[i] = ++capturedGroupIndex;
+-        }
+-      }
+-      for (var i = 0, groupIndex = 0; i < n; ++i) {
+-        var p = parts[i];
+-        if (p === '(') {
+-          ++groupIndex;
+-          if (!capturedGroups[groupIndex]) {
+-            parts[i] = '(?:';
+-          }
+-        } else if ('\\' === p.charAt(0)) {
+-          var decimalValue = +p.substring(1);
+-          if (decimalValue && decimalValue <= groupIndex) {
+-            parts[i] = '\\' + capturedGroups[decimalValue];
+-          }
+-        }
+-      }
+-  
+-      // Remove any prefix anchors so that the output will match anywhere.
+-      // ^^ really does mean an anchored match though.
+-      for (var i = 0; i < n; ++i) {
+-        if ('^' === parts[i] && '^' !== parts[i + 1]) { parts[i] = ''; }
+-      }
+-  
+-      // Expand letters to groups to handle mixing of case-sensitive and
+-      // case-insensitive patterns if necessary.
+-      if (regex.ignoreCase && needToFoldCase) {
+-        for (var i = 0; i < n; ++i) {
+-          var p = parts[i];
+-          var ch0 = p.charAt(0);
+-          if (p.length >= 2 && ch0 === '[') {
+-            parts[i] = caseFoldCharset(p);
+-          } else if (ch0 !== '\\') {
+-            // TODO: handle letters in numeric escapes.
+-            parts[i] = p.replace(
+-                /[a-zA-Z]/g,
+-                function (ch) {
+-                  var cc = ch.charCodeAt(0);
+-                  return '[' + String.fromCharCode(cc & ~32, cc | 32) + ']';
+-                });
+-          }
+-        }
+-      }
+-  
+-      return parts.join('');
+-    }
+-  
+-    var rewritten = [];
+-    for (var i = 0, n = regexs.length; i < n; ++i) {
+-      var regex = regexs[i];
+-      if (regex.global || regex.multiline) { throw new Error('' + regex); }
+-      rewritten.push(
+-          '(?:' + allowAnywhereFoldCaseAndRenumberGroups(regex) + ')');
+-    }
+-  
+-    return new RegExp(rewritten.join('|'), ignoreCase ? 'gi' : 'g');
+-  }
+-
+-
+-  /**
+-   * Split markup into a string of source code and an array mapping ranges in
+-   * that string to the text nodes in which they appear.
+-   *
+-   * <p>
+-   * The HTML DOM structure:</p>
+-   * <pre>
+-   * (Element   "p"
+-   *   (Element "b"
+-   *     (Text  "print "))       ; #1
+-   *   (Text    "'Hello '")      ; #2
+-   *   (Element "br")            ; #3
+-   *   (Text    "  + 'World';")) ; #4
+-   * </pre>
+-   * <p>
+-   * corresponds to the HTML
+-   * {@code <p><b>print </b>'Hello '<br>  + 'World';</p>}.</p>
+-   *
+-   * <p>
+-   * It will produce the output:</p>
+-   * <pre>
+-   * {
+-   *   sourceCode: "print 'Hello '\n  + 'World';",
+-   *   //                     1          2
+-   *   //           012345678901234 5678901234567
+-   *   spans: [0, #1, 6, #2, 14, #3, 15, #4]
+-   * }
+-   * </pre>
+-   * <p>
+-   * where #1 is a reference to the {@code "print "} text node above, and so
+-   * on for the other text nodes.
+-   * </p>
+-   *
+-   * <p>
+-   * The {@code} spans array is an array of pairs.  Even elements are the start
+-   * indices of substrings, and odd elements are the text nodes (or BR elements)
+-   * that contain the text for those substrings.
+-   * Substrings continue until the next index or the end of the source.
+-   * </p>
+-   *
+-   * @param {Node} node an HTML DOM subtree containing source-code.
+-   * @param {boolean} isPreformatted true if white-space in text nodes should
+-   *    be considered significant.
+-   * @return {Object} source code and the text nodes in which they occur.
+-   */
+-  function extractSourceSpans(node, isPreformatted) {
+-    var nocode = /(?:^|\s)nocode(?:\s|$)/;
+-  
+-    var chunks = [];
+-    var length = 0;
+-    var spans = [];
+-    var k = 0;
+-  
+-    function walk(node) {
+-      switch (node.nodeType) {
+-        case 1:  // Element
+-          if (nocode.test(node.className)) { return; }
+-          for (var child = node.firstChild; child; child = child.nextSibling) {
+-            walk(child);
+-          }
+-          var nodeName = node.nodeName.toLowerCase();
+-          if ('br' === nodeName || 'li' === nodeName) {
+-            chunks[k] = '\n';
+-            spans[k << 1] = length++;
+-            spans[(k++ << 1) | 1] = node;
+-          }
+-          break;
+-        case 3: case 4:  // Text
+-          var text = node.nodeValue;
+-          if (text.length) {
+-            if (!isPreformatted) {
+-              text = text.replace(/[ \t\r\n]+/g, ' ');
+-            } else {
+-              text = text.replace(/\r\n?/g, '\n');  // Normalize newlines.
+-            }
+-            // TODO: handle tabs here?
+-            chunks[k] = text;
+-            spans[k << 1] = length;
+-            length += text.length;
+-            spans[(k++ << 1) | 1] = node;
+-          }
+-          break;
+-      }
+-    }
+-  
+-    walk(node);
+-  
+-    return {
+-      sourceCode: chunks.join('').replace(/\n$/, ''),
+-      spans: spans
+-    };
+-  }
+-
+-
+-  /**
+-   * Apply the given language handler to sourceCode and add the resulting
+-   * decorations to out.
+-   * @param {number} basePos the index of sourceCode within the chunk of source
+-   *    whose decorations are already present on out.
+-   */
+-  function appendDecorations(basePos, sourceCode, langHandler, out) {
+-    if (!sourceCode) { return; }
+-    var job = {
+-      sourceCode: sourceCode,
+-      basePos: basePos
+-    };
+-    langHandler(job);
+-    out.push.apply(out, job.decorations);
+-  }
+-
+-  var notWs = /\S/;
+-
+-  /**
+-   * Given an element, if it contains only one child element and any text nodes
+-   * it contains contain only space characters, return the sole child element.
+-   * Otherwise returns undefined.
+-   * <p>
+-   * This is meant to return the CODE element in {@code <pre><code ...>} when
+-   * there is a single child element that contains all the non-space textual
+-   * content, but not to return anything where there are multiple child elements
+-   * as in {@code <pre><code>...</code><code>...</code></pre>} or when there
+-   * is textual content.
+-   */
+-  function childContentWrapper(element) {
+-    var wrapper = undefined;
+-    for (var c = element.firstChild; c; c = c.nextSibling) {
+-      var type = c.nodeType;
+-      wrapper = (type === 1)  // Element Node
+-          ? (wrapper ? element : c)
+-          : (type === 3)  // Text Node
+-          ? (notWs.test(c.nodeValue) ? element : wrapper)
+-          : wrapper;
+-    }
+-    return wrapper === element ? undefined : wrapper;
+-  }
+-
+-  /** Given triples of [style, pattern, context] returns a lexing function,
+-    * The lexing function interprets the patterns to find token boundaries and
+-    * returns a decoration list of the form
+-    * [index_0, style_0, index_1, style_1, ..., index_n, style_n]
+-    * where index_n is an index into the sourceCode, and style_n is a style
+-    * constant like PR_PLAIN.  index_n-1 <= index_n, and style_n-1 applies to
+-    * all characters in sourceCode[index_n-1:index_n].
+-    *
+-    * The stylePatterns is a list whose elements have the form
+-    * [style : string, pattern : RegExp, DEPRECATED, shortcut : string].
+-    *
+-    * Style is a style constant like PR_PLAIN, or can be a string of the
+-    * form 'lang-FOO', where FOO is a language extension describing the
+-    * language of the portion of the token in $1 after pattern executes.
+-    * E.g., if style is 'lang-lisp', and group 1 contains the text
+-    * '(hello (world))', then that portion of the token will be passed to the
+-    * registered lisp handler for formatting.
+-    * The text before and after group 1 will be restyled using this decorator
+-    * so decorators should take care that this doesn't result in infinite
+-    * recursion.  For example, the HTML lexer rule for SCRIPT elements looks
+-    * something like ['lang-js', /<[s]cript>(.+?)<\/script>/].  This may match
+-    * '<script>foo()<\/script>', which would cause the current decorator to
+-    * be called with '<script>' which would not match the same rule since
+-    * group 1 must not be empty, so it would be instead styled as PR_TAG by
+-    * the generic tag rule.  The handler registered for the 'js' extension would
+-    * then be called with 'foo()', and finally, the current decorator would
+-    * be called with '<\/script>' which would not match the original rule and
+-    * so the generic tag rule would identify it as a tag.
+-    *
+-    * Pattern must only match prefixes, and if it matches a prefix, then that
+-    * match is considered a token with the same style.
+-    *
+-    * Context is applied to the last non-whitespace, non-comment token
+-    * recognized.
+-    *
+-    * Shortcut is an optional string of characters, any of which, if the first
+-    * character, gurantee that this pattern and only this pattern matches.
+-    *
+-    * @param {Array} shortcutStylePatterns patterns that always start with
+-    *   a known character.  Must have a shortcut string.
+-    * @param {Array} fallthroughStylePatterns patterns that will be tried in
+-    *   order if the shortcut ones fail.  May have shortcuts.
+-    *
+-    * @return {function (Object)} a
+-    *   function that takes source code and returns a list of decorations.
+-    */
+-  function createSimpleLexer(shortcutStylePatterns, fallthroughStylePatterns) {
+-    var shortcuts = {};
+-    var tokenizer;
+-    (function () {
+-      var allPatterns = shortcutStylePatterns.concat(fallthroughStylePatterns);
+-      var allRegexs = [];
+-      var regexKeys = {};
+-      for (var i = 0, n = allPatterns.length; i < n; ++i) {
+-        var patternParts = allPatterns[i];
+-        var shortcutChars = patternParts[3];
+-        if (shortcutChars) {
+-          for (var c = shortcutChars.length; --c >= 0;) {
+-            shortcuts[shortcutChars.charAt(c)] = patternParts;
+-          }
+-        }
+-        var regex = patternParts[1];
+-        var k = '' + regex;
+-        if (!regexKeys.hasOwnProperty(k)) {
+-          allRegexs.push(regex);
+-          regexKeys[k] = null;
+-        }
+-      }
+-      allRegexs.push(/[\0-\uffff]/);
+-      tokenizer = combinePrefixPatterns(allRegexs);
+-    })();
+-
+-    var nPatterns = fallthroughStylePatterns.length;
+-
+-    /**
+-     * Lexes job.sourceCode and produces an output array job.decorations of
+-     * style classes preceded by the position at which they start in
+-     * job.sourceCode in order.
+-     *
+-     * @param {Object} job an object like <pre>{
+-     *    sourceCode: {string} sourceText plain text,
+-     *    basePos: {int} position of job.sourceCode in the larger chunk of
+-     *        sourceCode.
+-     * }</pre>
+-     */
+-    var decorate = function (job) {
+-      var sourceCode = job.sourceCode, basePos = job.basePos;
+-      /** Even entries are positions in source in ascending order.  Odd enties
+-        * are style markers (e.g., PR_COMMENT) that run from that position until
+-        * the end.
+-        * @type {Array.<number|string>}
+-        */
+-      var decorations = [basePos, PR_PLAIN];
+-      var pos = 0;  // index into sourceCode
+-      var tokens = sourceCode.match(tokenizer) || [];
+-      var styleCache = {};
+-
+-      for (var ti = 0, nTokens = tokens.length; ti < nTokens; ++ti) {
+-        var token = tokens[ti];
+-        var style = styleCache[token];
+-        var match = void 0;
+-
+-        var isEmbedded;
+-        if (typeof style === 'string') {
+-          isEmbedded = false;
+-        } else {
+-          var patternParts = shortcuts[token.charAt(0)];
+-          if (patternParts) {
+-            match = token.match(patternParts[1]);
+-            style = patternParts[0];
+-          } else {
+-            for (var i = 0; i < nPatterns; ++i) {
+-              patternParts = fallthroughStylePatterns[i];
+-              match = token.match(patternParts[1]);
+-              if (match) {
+-                style = patternParts[0];
+-                break;
+-              }
+-            }
+-
+-            if (!match) {  // make sure that we make progress
+-              style = PR_PLAIN;
+-            }
+-          }
+-
+-          isEmbedded = style.length >= 5 && 'lang-' === style.substring(0, 5);
+-          if (isEmbedded && !(match && typeof match[1] === 'string')) {
+-            isEmbedded = false;
+-            style = PR_SOURCE;
+-          }
+-
+-          if (!isEmbedded) { styleCache[token] = style; }
+-        }
+-
+-        var tokenStart = pos;
+-        pos += token.length;
+-
+-        if (!isEmbedded) {
+-          decorations.push(basePos + tokenStart, style);
+-        } else {  // Treat group 1 as an embedded block of source code.
+-          var embeddedSource = match[1];
+-          var embeddedSourceStart = token.indexOf(embeddedSource);
+-          var embeddedSourceEnd = embeddedSourceStart + embeddedSource.length;
+-          if (match[2]) {
+-            // If embeddedSource can be blank, then it would match at the
+-            // beginning which would cause us to infinitely recurse on the
+-            // entire token, so we catch the right context in match[2].
+-            embeddedSourceEnd = token.length - match[2].length;
+-            embeddedSourceStart = embeddedSourceEnd - embeddedSource.length;
+-          }
+-          var lang = style.substring(5);
+-          // Decorate the left of the embedded source
+-          appendDecorations(
+-              basePos + tokenStart,
+-              token.substring(0, embeddedSourceStart),
+-              decorate, decorations);
+-          // Decorate the embedded source
+-          appendDecorations(
+-              basePos + tokenStart + embeddedSourceStart,
+-              embeddedSource,
+-              langHandlerForExtension(lang, embeddedSource),
+-              decorations);
+-          // Decorate the right of the embedded section
+-          appendDecorations(
+-              basePos + tokenStart + embeddedSourceEnd,
+-              token.substring(embeddedSourceEnd),
+-              decorate, decorations);
+-        }
+-      }
+-      job.decorations = decorations;
+-    };
+-    return decorate;
+-  }
+-
+-  /** returns a function that produces a list of decorations from source text.
+-    *
+-    * This code treats ", ', and ` as string delimiters, and \ as a string
+-    * escape.  It does not recognize perl's qq() style strings.
+-    * It has no special handling for double delimiter escapes as in basic, or
+-    * the tripled delimiters used in python, but should work on those regardless
+-    * although in those cases a single string literal may be broken up into
+-    * multiple adjacent string literals.
+-    *
+-    * It recognizes C, C++, and shell style comments.
+-    *
+-    * @param {Object} options a set of optional parameters.
+-    * @return {function (Object)} a function that examines the source code
+-    *     in the input job and builds the decoration list.
+-    */
+-  function sourceDecorator(options) {
+-    var shortcutStylePatterns = [], fallthroughStylePatterns = [];
+-    if (options['tripleQuotedStrings']) {
+-      // '''multi-line-string''', 'single-line-string', and double-quoted
+-      shortcutStylePatterns.push(
+-          [PR_STRING,  /^(?:\'\'\'(?:[^\'\\]|\\[\s\S]|\'{1,2}(?=[^\']))*(?:\'\'\'|$)|\"\"\"(?:[^\"\\]|\\[\s\S]|\"{1,2}(?=[^\"]))*(?:\"\"\"|$)|\'(?:[^\\\']|\\[\s\S])*(?:\'|$)|\"(?:[^\\\"]|\\[\s\S])*(?:\"|$))/,
+-           null, '\'"']);
+-    } else if (options['multiLineStrings']) {
+-      // 'multi-line-string', "multi-line-string"
+-      shortcutStylePatterns.push(
+-          [PR_STRING,  /^(?:\'(?:[^\\\']|\\[\s\S])*(?:\'|$)|\"(?:[^\\\"]|\\[\s\S])*(?:\"|$)|\`(?:[^\\\`]|\\[\s\S])*(?:\`|$))/,
+-           null, '\'"`']);
+-    } else {
+-      // 'single-line-string', "single-line-string"
+-      shortcutStylePatterns.push(
+-          [PR_STRING,
+-           /^(?:\'(?:[^\\\'\r\n]|\\.)*(?:\'|$)|\"(?:[^\\\"\r\n]|\\.)*(?:\"|$))/,
+-           null, '"\'']);
+-    }
+-    if (options['verbatimStrings']) {
+-      // verbatim-string-literal production from the C# grammar.  See issue 93.
+-      fallthroughStylePatterns.push(
+-          [PR_STRING, /^@\"(?:[^\"]|\"\")*(?:\"|$)/, null]);
+-    }
+-    var hc = options['hashComments'];
+-    if (hc) {
+-      if (options['cStyleComments']) {
+-        if (hc > 1) {  // multiline hash comments
+-          shortcutStylePatterns.push(
+-              [PR_COMMENT, /^#(?:##(?:[^#]|#(?!##))*(?:###|$)|.*)/, null, '#']);
+-        } else {
+-          // Stop C preprocessor declarations at an unclosed open comment
+-          shortcutStylePatterns.push(
+-              [PR_COMMENT, /^#(?:(?:define|elif|else|endif|error|ifdef|include|ifndef|line|pragma|undef|warning)\b|[^\r\n]*)/,
+-               null, '#']);
+-        }
+-        // #include <stdio.h>
+-        fallthroughStylePatterns.push(
+-            [PR_STRING,
+-             /^<(?:(?:(?:\.\.\/)*|\/?)(?:[\w-]+(?:\/[\w-]+)+)?[\w-]+\.h(?:h|pp|\+\+)?|[a-z]\w*)>/,
+-             null]);
+-      } else {
+-        shortcutStylePatterns.push([PR_COMMENT, /^#[^\r\n]*/, null, '#']);
+-      }
+-    }
+-    if (options['cStyleComments']) {
+-      fallthroughStylePatterns.push([PR_COMMENT, /^\/\/[^\r\n]*/, null]);
+-      fallthroughStylePatterns.push(
+-          [PR_COMMENT, /^\/\*[\s\S]*?(?:\*\/|$)/, null]);
+-    }
+-    if (options['regexLiterals']) {
+-      /**
+-       * @const
+-       */
+-      var REGEX_LITERAL = (
+-          // A regular expression literal starts with a slash that is
+-          // not followed by * or / so that it is not confused with
+-          // comments.
+-          '/(?=[^/*])'
+-          // and then contains any number of raw characters,
+-          + '(?:[^/\\x5B\\x5C]'
+-          // escape sequences (\x5C),
+-          +    '|\\x5C[\\s\\S]'
+-          // or non-nesting character sets (\x5B\x5D);
+-          +    '|\\x5B(?:[^\\x5C\\x5D]|\\x5C[\\s\\S])*(?:\\x5D|$))+'
+-          // finally closed by a /.
+-          + '/');
+-      fallthroughStylePatterns.push(
+-          ['lang-regex',
+-           new RegExp('^' + REGEXP_PRECEDER_PATTERN + '(' + REGEX_LITERAL + ')')
+-           ]);
+-    }
+-
+-    var types = options['types'];
+-    if (types) {
+-      fallthroughStylePatterns.push([PR_TYPE, types]);
+-    }
+-
+-    var keywords = ("" + options['keywords']).replace(/^ | $/g, '');
+-    if (keywords.length) {
+-      fallthroughStylePatterns.push(
+-          [PR_KEYWORD,
+-           new RegExp('^(?:' + keywords.replace(/[\s,]+/g, '|') + ')\\b'),
+-           null]);
+-    }
+-
+-    shortcutStylePatterns.push([PR_PLAIN,       /^\s+/, null, ' \r\n\t\xA0']);
+-    fallthroughStylePatterns.push(
+-        // TODO(mikesamuel): recognize non-latin letters and numerals in idents
+-        [PR_LITERAL,     /^@[a-z_$][a-z_$@0-9]*/i, null],
+-        [PR_TYPE,        /^(?:[@_]?[A-Z]+[a-z][A-Za-z_$@0-9]*|\w+_t\b)/, null],
+-        [PR_PLAIN,       /^[a-z_$][a-z_$@0-9]*/i, null],
+-        [PR_LITERAL,
+-         new RegExp(
+-             '^(?:'
+-             // A hex number
+-             + '0x[a-f0-9]+'
+-             // or an octal or decimal number,
+-             + '|(?:\\d(?:_\\d+)*\\d*(?:\\.\\d*)?|\\.\\d\\+)'
+-             // possibly in scientific notation
+-             + '(?:e[+\\-]?\\d+)?'
+-             + ')'
+-             // with an optional modifier like UL for unsigned long
+-             + '[a-z]*', 'i'),
+-         null, '0123456789'],
+-        // Don't treat escaped quotes in bash as starting strings.  See issue 144.
+-        [PR_PLAIN,       /^\\[\s\S]?/, null],
+-        [PR_PUNCTUATION, /^.[^\s\w\.$@\'\"\`\/\#\\]*/, null]);
+-
+-    return createSimpleLexer(shortcutStylePatterns, fallthroughStylePatterns);
+-  }
+-
+-  var decorateSource = sourceDecorator({
+-        'keywords': ALL_KEYWORDS,
+-        'hashComments': true,
+-        'cStyleComments': true,
+-        'multiLineStrings': true,
+-        'regexLiterals': true
+-      });
+-
+-  /**
+-   * Given a DOM subtree, wraps it in a list, and puts each line into its own
+-   * list item.
+-   *
+-   * @param {Node} node modified in place.  Its content is pulled into an
+-   *     HTMLOListElement, and each line is moved into a separate list item.
+-   *     This requires cloning elements, so the input might not have unique
+-   *     IDs after numbering.
+-   * @param {boolean} isPreformatted true iff white-space in text nodes should
+-   *     be treated as significant.
+-   */
+-  function numberLines(node, opt_startLineNum, isPreformatted) {
+-    var nocode = /(?:^|\s)nocode(?:\s|$)/;
+-    var lineBreak = /\r\n?|\n/;
+-  
+-    var document = node.ownerDocument;
+-  
+-    var li = document.createElement('li');
+-    while (node.firstChild) {
+-      li.appendChild(node.firstChild);
+-    }
+-    // An array of lines.  We split below, so this is initialized to one
+-    // un-split line.
+-    var listItems = [li];
+-  
+-    function walk(node) {
+-      switch (node.nodeType) {
+-        case 1:  // Element
+-          if (nocode.test(node.className)) { break; }
+-          if ('br' === node.nodeName) {
+-            breakAfter(node);
+-            // Discard the <BR> since it is now flush against a </LI>.
+-            if (node.parentNode) {
+-              node.parentNode.removeChild(node);
+-            }
+-          } else {
+-            for (var child = node.firstChild; child; child = child.nextSibling) {
+-              walk(child);
+-            }
+-          }
+-          break;
+-        case 3: case 4:  // Text
+-          if (isPreformatted) {
+-            var text = node.nodeValue;
+-            var match = text.match(lineBreak);
+-            if (match) {
+-              var firstLine = text.substring(0, match.index);
+-              node.nodeValue = firstLine;
+-              var tail = text.substring(match.index + match[0].length);
+-              if (tail) {
+-                var parent = node.parentNode;
+-                parent.insertBefore(
+-                    document.createTextNode(tail), node.nextSibling);
+-              }
+-              breakAfter(node);
+-              if (!firstLine) {
+-                // Don't leave blank text nodes in the DOM.
+-                node.parentNode.removeChild(node);
+-              }
+-            }
+-          }
+-          break;
+-      }
+-    }
+-  
+-    // Split a line after the given node.
+-    function breakAfter(lineEndNode) {
+-      // If there's nothing to the right, then we can skip ending the line
+-      // here, and move root-wards since splitting just before an end-tag
+-      // would require us to create a bunch of empty copies.
+-      while (!lineEndNode.nextSibling) {
+-        lineEndNode = lineEndNode.parentNode;
+-        if (!lineEndNode) { return; }
+-      }
+-  
+-      function breakLeftOf(limit, copy) {
+-        // Clone shallowly if this node needs to be on both sides of the break.
+-        var rightSide = copy ? limit.cloneNode(false) : limit;
+-        var parent = limit.parentNode;
+-        if (parent) {
+-          // We clone the parent chain.
+-          // This helps us resurrect important styling elements that cross lines.
+-          // E.g. in <i>Foo<br>Bar</i>
+-          // should be rewritten to <li><i>Foo</i></li><li><i>Bar</i></li>.
+-          var parentClone = breakLeftOf(parent, 1);
+-          // Move the clone and everything to the right of the original
+-          // onto the cloned parent.
+-          var next = limit.nextSibling;
+-          parentClone.appendChild(rightSide);
+-          for (var sibling = next; sibling; sibling = next) {
+-            next = sibling.nextSibling;
+-            parentClone.appendChild(sibling);
+-          }
+-        }
+-        return rightSide;
+-      }
+-  
+-      var copiedListItem = breakLeftOf(lineEndNode.nextSibling, 0);
+-  
+-      // Walk the parent chain until we reach an unattached LI.
+-      for (var parent;
+-           // Check nodeType since IE invents document fragments.
+-           (parent = copiedListItem.parentNode) && parent.nodeType === 1;) {
+-        copiedListItem = parent;
+-      }
+-      // Put it on the list of lines for later processing.
+-      listItems.push(copiedListItem);
+-    }
+-  
+-    // Split lines while there are lines left to split.
+-    for (var i = 0;  // Number of lines that have been split so far.
+-         i < listItems.length;  // length updated by breakAfter calls.
+-         ++i) {
+-      walk(listItems[i]);
+-    }
+-  
+-    // Make sure numeric indices show correctly.
+-    if (opt_startLineNum === (opt_startLineNum|0)) {
+-      listItems[0].setAttribute('value', opt_startLineNum);
+-    }
+-  
+-    var ol = document.createElement('ol');
+-    ol.className = 'linenums';
+-    var offset = Math.max(0, ((opt_startLineNum - 1 /* zero index */)) | 0) || 0;
+-    for (var i = 0, n = listItems.length; i < n; ++i) {
+-      li = listItems[i];
+-      // Stick a class on the LIs so that stylesheets can
+-      // color odd/even rows, or any other row pattern that
+-      // is co-prime with 10.
+-      li.className = 'L' + ((i + offset) % 10);
+-      if (!li.firstChild) {
+-        li.appendChild(document.createTextNode('\xA0'));
+-      }
+-      ol.appendChild(li);
+-    }
+-  
+-    node.appendChild(ol);
+-  }
+-
+-  /**
+-   * Breaks {@code job.sourceCode} around style boundaries in
+-   * {@code job.decorations} and modifies {@code job.sourceNode} in place.
+-   * @param {Object} job like <pre>{
+-   *    sourceCode: {string} source as plain text,
+-   *    spans: {Array.<number|Node>} alternating span start indices into source
+-   *       and the text node or element (e.g. {@code <BR>}) corresponding to that
+-   *       span.
+-   *    decorations: {Array.<number|string} an array of style classes preceded
+-   *       by the position at which they start in job.sourceCode in order
+-   * }</pre>
+-   * @private
+-   */
+-  function recombineTagsAndDecorations(job) {
+-    var isIE8OrEarlier = /\bMSIE\s(\d+)/.exec(navigator.userAgent);
+-    isIE8OrEarlier = isIE8OrEarlier && +isIE8OrEarlier[1] <= 8;
+-    var newlineRe = /\n/g;
+-  
+-    var source = job.sourceCode;
+-    var sourceLength = source.length;
+-    // Index into source after the last code-unit recombined.
+-    var sourceIndex = 0;
+-  
+-    var spans = job.spans;
+-    var nSpans = spans.length;
+-    // Index into spans after the last span which ends at or before sourceIndex.
+-    var spanIndex = 0;
+-  
+-    var decorations = job.decorations;
+-    var nDecorations = decorations.length;
+-    // Index into decorations after the last decoration which ends at or before
+-    // sourceIndex.
+-    var decorationIndex = 0;
+-  
+-    // Remove all zero-length decorations.
+-    decorations[nDecorations] = sourceLength;
+-    var decPos, i;
+-    for (i = decPos = 0; i < nDecorations;) {
+-      if (decorations[i] !== decorations[i + 2]) {
+-        decorations[decPos++] = decorations[i++];
+-        decorations[decPos++] = decorations[i++];
+-      } else {
+-        i += 2;
+-      }
+-    }
+-    nDecorations = decPos;
+-  
+-    // Simplify decorations.
+-    for (i = decPos = 0; i < nDecorations;) {
+-      var startPos = decorations[i];
+-      // Conflate all adjacent decorations that use the same style.
+-      var startDec = decorations[i + 1];
+-      var end = i + 2;
+-      while (end + 2 <= nDecorations && decorations[end + 1] === startDec) {
+-        end += 2;
+-      }
+-      decorations[decPos++] = startPos;
+-      decorations[decPos++] = startDec;
+-      i = end;
+-    }
+-  
+-    nDecorations = decorations.length = decPos;
+-  
+-    var sourceNode = job.sourceNode;
+-    var oldDisplay;
+-    if (sourceNode) {
+-      oldDisplay = sourceNode.style.display;
+-      sourceNode.style.display = 'none';
+-    }
+-    try {
+-      var decoration = null;
+-      while (spanIndex < nSpans) {
+-        var spanStart = spans[spanIndex];
+-        var spanEnd = spans[spanIndex + 2] || sourceLength;
+-  
+-        var decEnd = decorations[decorationIndex + 2] || sourceLength;
+-  
+-        var end = Math.min(spanEnd, decEnd);
+-  
+-        var textNode = spans[spanIndex + 1];
+-        var styledText;
+-        if (textNode.nodeType !== 1  // Don't muck with <BR>s or <LI>s
+-            // Don't introduce spans around empty text nodes.
+-            && (styledText = source.substring(sourceIndex, end))) {
+-          // This may seem bizarre, and it is.  Emitting LF on IE causes the
+-          // code to display with spaces instead of line breaks.
+-          // Emitting Windows standard issue linebreaks (CRLF) causes a blank
+-          // space to appear at the beginning of every line but the first.
+-          // Emitting an old Mac OS 9 line separator makes everything spiffy.
+-          if (isIE8OrEarlier) {
+-            styledText = styledText.replace(newlineRe, '\r');
+-          }
+-          textNode.nodeValue = styledText;
+-          var document = textNode.ownerDocument;
+-          var span = document.createElement('span');
+-          span.className = decorations[decorationIndex + 1];
+-          var parentNode = textNode.parentNode;
+-          parentNode.replaceChild(span, textNode);
+-          span.appendChild(textNode);
+-          if (sourceIndex < spanEnd) {  // Split off a text node.
+-            spans[spanIndex + 1] = textNode
+-                // TODO: Possibly optimize by using '' if there's no flicker.
+-                = document.createTextNode(source.substring(end, spanEnd));
+-            parentNode.insertBefore(textNode, span.nextSibling);
+-          }
+-        }
+-  
+-        sourceIndex = end;
+-  
+-        if (sourceIndex >= spanEnd) {
+-          spanIndex += 2;
+-        }
+-        if (sourceIndex >= decEnd) {
+-          decorationIndex += 2;
+-        }
+-      }
+-    } finally {
+-      if (sourceNode) {
+-        sourceNode.style.display = oldDisplay;
+-      }
+-    }
+-  }
+-
+-
+-  /** Maps language-specific file extensions to handlers. */
+-  var langHandlerRegistry = {};
+-  /** Register a language handler for the given file extensions.
+-    * @param {function (Object)} handler a function from source code to a list
+-    *      of decorations.  Takes a single argument job which describes the
+-    *      state of the computation.   The single parameter has the form
+-    *      {@code {
+-    *        sourceCode: {string} as plain text.
+-    *        decorations: {Array.<number|string>} an array of style classes
+-    *                     preceded by the position at which they start in
+-    *                     job.sourceCode in order.
+-    *                     The language handler should assigned this field.
+-    *        basePos: {int} the position of source in the larger source chunk.
+-    *                 All positions in the output decorations array are relative
+-    *                 to the larger source chunk.
+-    *      } }
+-    * @param {Array.<string>} fileExtensions
+-    */
+-  function registerLangHandler(handler, fileExtensions) {
+-    for (var i = fileExtensions.length; --i >= 0;) {
+-      var ext = fileExtensions[i];
+-      if (!langHandlerRegistry.hasOwnProperty(ext)) {
+-        langHandlerRegistry[ext] = handler;
+-      } else if (win['console']) {
+-        console['warn']('cannot override language handler %s', ext);
+-      }
+-    }
+-  }
+-  function langHandlerForExtension(extension, source) {
+-    if (!(extension && langHandlerRegistry.hasOwnProperty(extension))) {
+-      // Treat it as markup if the first non whitespace character is a < and
+-      // the last non-whitespace character is a >.
+-      extension = /^\s*</.test(source)
+-          ? 'default-markup'
+-          : 'default-code';
+-    }
+-    return langHandlerRegistry[extension];
+-  }
+-  registerLangHandler(decorateSource, ['default-code']);
+-  registerLangHandler(
+-      createSimpleLexer(
+-          [],
+-          [
+-           [PR_PLAIN,       /^[^<?]+/],
+-           [PR_DECLARATION, /^<!\w[^>]*(?:>|$)/],
+-           [PR_COMMENT,     /^<\!--[\s\S]*?(?:-\->|$)/],
+-           // Unescaped content in an unknown language
+-           ['lang-',        /^<\?([\s\S]+?)(?:\?>|$)/],
+-           ['lang-',        /^<%([\s\S]+?)(?:%>|$)/],
+-           [PR_PUNCTUATION, /^(?:<[%?]|[%?]>)/],
+-           ['lang-',        /^<xmp\b[^>]*>([\s\S]+?)<\/xmp\b[^>]*>/i],
+-           // Unescaped content in javascript.  (Or possibly vbscript).
+-           ['lang-js',      /^<script\b[^>]*>([\s\S]*?)(<\/script\b[^>]*>)/i],
+-           // Contains unescaped stylesheet content
+-           ['lang-css',     /^<style\b[^>]*>([\s\S]*?)(<\/style\b[^>]*>)/i],
+-           ['lang-in.tag',  /^(<\/?[a-z][^<>]*>)/i]
+-          ]),
+-      ['default-markup', 'htm', 'html', 'mxml', 'xhtml', 'xml', 'xsl']);
+-  registerLangHandler(
+-      createSimpleLexer(
+-          [
+-           [PR_PLAIN,        /^[\s]+/, null, ' \t\r\n'],
+-           [PR_ATTRIB_VALUE, /^(?:\"[^\"]*\"?|\'[^\']*\'?)/, null, '\"\'']
+-           ],
+-          [
+-           [PR_TAG,          /^^<\/?[a-z](?:[\w.:-]*\w)?|\/?>$/i],
+-           [PR_ATTRIB_NAME,  /^(?!style[\s=]|on)[a-z](?:[\w:-]*\w)?/i],
+-           ['lang-uq.val',   /^=\s*([^>\'\"\s]*(?:[^>\'\"\s\/]|\/(?=\s)))/],
+-           [PR_PUNCTUATION,  /^[=<>\/]+/],
+-           ['lang-js',       /^on\w+\s*=\s*\"([^\"]+)\"/i],
+-           ['lang-js',       /^on\w+\s*=\s*\'([^\']+)\'/i],
+-           ['lang-js',       /^on\w+\s*=\s*([^\"\'>\s]+)/i],
+-           ['lang-css',      /^style\s*=\s*\"([^\"]+)\"/i],
+-           ['lang-css',      /^style\s*=\s*\'([^\']+)\'/i],
+-           ['lang-css',      /^style\s*=\s*([^\"\'>\s]+)/i]
+-           ]),
+-      ['in.tag']);
+-  registerLangHandler(
+-      createSimpleLexer([], [[PR_ATTRIB_VALUE, /^[\s\S]+/]]), ['uq.val']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': CPP_KEYWORDS,
+-          'hashComments': true,
+-          'cStyleComments': true,
+-          'types': C_TYPES
+-        }), ['c', 'cc', 'cpp', 'cxx', 'cyc', 'm']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': 'null,true,false'
+-        }), ['json']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': CSHARP_KEYWORDS,
+-          'hashComments': true,
+-          'cStyleComments': true,
+-          'verbatimStrings': true,
+-          'types': C_TYPES
+-        }), ['cs']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': JAVA_KEYWORDS,
+-          'cStyleComments': true
+-        }), ['java']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': SH_KEYWORDS,
+-          'hashComments': true,
+-          'multiLineStrings': true
+-        }), ['bsh', 'csh', 'sh']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': PYTHON_KEYWORDS,
+-          'hashComments': true,
+-          'multiLineStrings': true,
+-          'tripleQuotedStrings': true
+-        }), ['cv', 'py']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': PERL_KEYWORDS,
+-          'hashComments': true,
+-          'multiLineStrings': true,
+-          'regexLiterals': true
+-        }), ['perl', 'pl', 'pm']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': RUBY_KEYWORDS,
+-          'hashComments': true,
+-          'multiLineStrings': true,
+-          'regexLiterals': true
+-        }), ['rb']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': JSCRIPT_KEYWORDS,
+-          'cStyleComments': true,
+-          'regexLiterals': true
+-        }), ['js']);
+-  registerLangHandler(sourceDecorator({
+-          'keywords': COFFEE_KEYWORDS,
+-          'hashComments': 3,  // ### style block comments
+-          'cStyleComments': true,
+-          'multilineStrings': true,
+-          'tripleQuotedStrings': true,
+-          'regexLiterals': true
+-        }), ['coffee']);
+-  registerLangHandler(
+-      createSimpleLexer([], [[PR_STRING, /^[\s\S]+/]]), ['regex']);
+-
+-  function applyDecorator(job) {
+-    var opt_langExtension = job.langExtension;
+-
+-    try {
+-      // Extract tags, and convert the source code to plain text.
+-      var sourceAndSpans = extractSourceSpans(job.sourceNode, job.pre);
+-      /** Plain text. @type {string} */
+-      var source = sourceAndSpans.sourceCode;
+-      job.sourceCode = source;
+-      job.spans = sourceAndSpans.spans;
+-      job.basePos = 0;
+-
+-      // Apply the appropriate language handler
+-      langHandlerForExtension(opt_langExtension, source)(job);
+-
+-      // Integrate the decorations and tags back into the source code,
+-      // modifying the sourceNode in place.
+-      recombineTagsAndDecorations(job);
+-    } catch (e) {
+-      if (win['console']) {
+-        console['log'](e && e['stack'] ? e['stack'] : e);
+-      }
+-    }
+-  }
+-
+-  /**
+-   * @param sourceCodeHtml {string} The HTML to pretty print.
+-   * @param opt_langExtension {string} The language name to use.
+-   *     Typically, a filename extension like 'cpp' or 'java'.
+-   * @param opt_numberLines {number|boolean} True to number lines,
+-   *     or the 1-indexed number of the first line in sourceCodeHtml.
+-   */
+-  function prettyPrintOne(sourceCodeHtml, opt_langExtension, opt_numberLines) {
+-    var container = document.createElement('pre');
+-    // This could cause images to load and onload listeners to fire.
+-    // E.g. <img onerror="alert(1337)" src="nosuchimage.png">.
+-    // We assume that the inner HTML is from a trusted source.
+-    container.innerHTML = sourceCodeHtml;
+-    if (opt_numberLines) {
+-      numberLines(container, opt_numberLines, true);
+-    }
+-
+-    var job = {
+-      langExtension: opt_langExtension,
+-      numberLines: opt_numberLines,
+-      sourceNode: container,
+-      pre: 1
+-    };
+-    applyDecorator(job);
+-    return container.innerHTML;
+-  }
+-
+-  function prettyPrint(opt_whenDone) {
+-    function byTagName(tn) { return document.getElementsByTagName(tn); }
+-    // fetch a list of nodes to rewrite
+-    var codeSegments = [byTagName('pre'), byTagName('code'), byTagName('xmp')];
+-    var elements = [];
+-    for (var i = 0; i < codeSegments.length; ++i) {
+-      for (var j = 0, n = codeSegments[i].length; j < n; ++j) {
+-        elements.push(codeSegments[i][j]);
+-      }
+-    }
+-    codeSegments = null;
+-
+-    var clock = Date;
+-    if (!clock['now']) {
+-      clock = { 'now': function () { return +(new Date); } };
+-    }
+-
+-    // The loop is broken into a series of continuations to make sure that we
+-    // don't make the browser unresponsive when rewriting a large page.
+-    var k = 0;
+-    var prettyPrintingJob;
+-
+-    var langExtensionRe = /\blang(?:uage)?-([\w.]+)(?!\S)/;
+-    var prettyPrintRe = /\bprettyprint\b/;
+-    var prettyPrintedRe = /\bprettyprinted\b/;
+-    var preformattedTagNameRe = /pre|xmp/i;
+-    var codeRe = /^code$/i;
+-    var preCodeXmpRe = /^(?:pre|code|xmp)$/i;
+-
+-    function doWork() {
+-      var endTime = (win['PR_SHOULD_USE_CONTINUATION'] ?
+-                     clock['now']() + 250 /* ms */ :
+-                     Infinity);
+-      for (; k < elements.length && clock['now']() < endTime; k++) {
+-        var cs = elements[k];
+-        var className = cs.className;
+-        if (prettyPrintRe.test(className)
+-            // Don't redo this if we've already done it.
+-            // This allows recalling pretty print to just prettyprint elements
+-            // that have been added to the page since last call.
+-            && !prettyPrintedRe.test(className)) {
+-
+-          // make sure this is not nested in an already prettified element
+-          var nested = false;
+-          for (var p = cs.parentNode; p; p = p.parentNode) {
+-            var tn = p.tagName;
+-            if (preCodeXmpRe.test(tn)
+-                && p.className && prettyPrintRe.test(p.className)) {
+-              nested = true;
+-              break;
+-            }
+-          }
+-          if (!nested) {
+-            // Mark done.  If we fail to prettyprint for whatever reason,
+-            // we shouldn't try again.
+-            cs.className += ' prettyprinted';
+-
+-            // If the classes includes a language extensions, use it.
+-            // Language extensions can be specified like
+-            //     <pre class="prettyprint lang-cpp">
+-            // the language extension "cpp" is used to find a language handler
+-            // as passed to PR.registerLangHandler.
+-            // HTML5 recommends that a language be specified using "language-"
+-            // as the prefix instead.  Google Code Prettify supports both.
+-            // http://dev.w3.org/html5/spec-author-view/the-code-element.html
+-            var langExtension = className.match(langExtensionRe);
+-            // Support <pre class="prettyprint"><code class="language-c">
+-            var wrapper;
+-            if (!langExtension && (wrapper = childContentWrapper(cs))
+-                && codeRe.test(wrapper.tagName)) {
+-              langExtension = wrapper.className.match(langExtensionRe);
+-            }
+-
+-            if (langExtension) { langExtension = langExtension[1]; }
+-
+-            var preformatted;
+-            if (preformattedTagNameRe.test(cs.tagName)) {
+-              preformatted = 1;
+-            } else {
+-              var currentStyle = cs['currentStyle'];
+-              var whitespace = (
+-                  currentStyle
+-                  ? currentStyle['whiteSpace']
+-                  : (document.defaultView
+-                     && document.defaultView.getComputedStyle)
+-                  ? document.defaultView.getComputedStyle(cs, null)
+-                  .getPropertyValue('white-space')
+-                  : 0);
+-              preformatted = whitespace
+-                  && 'pre' === whitespace.substring(0, 3);
+-            }
+-
+-            // Look for a class like linenums or linenums:<n> where <n> is the
+-            // 1-indexed number of the first line.
+-            var lineNums = cs.className.match(/\blinenums\b(?::(\d+))?/);
+-            lineNums = lineNums
+-                ? lineNums[1] && lineNums[1].length ? +lineNums[1] : true
+-                : false;
+-            if (lineNums) { numberLines(cs, lineNums, preformatted); }
+-
+-            // do the pretty printing
+-            prettyPrintingJob = {
+-              langExtension: langExtension,
+-              sourceNode: cs,
+-              numberLines: lineNums,
+-              pre: preformatted
+-            };
+-            applyDecorator(prettyPrintingJob);
+-          }
+-        }
+-      }
+-      if (k < elements.length) {
+-        // finish up in a continuation
+-        setTimeout(doWork, 250);
+-      } else if (opt_whenDone) {
+-        opt_whenDone();
+-      }
+-    }
+-
+-    doWork();
+-  }
+-
+-  /**
+-   * Contains functions for creating and registering new language handlers.
+-   * @type {Object}
+-   */
+-  var PR = win['PR'] = {
+-        'createSimpleLexer': createSimpleLexer,
+-        'registerLangHandler': registerLangHandler,
+-        'sourceDecorator': sourceDecorator,
+-        'PR_ATTRIB_NAME': PR_ATTRIB_NAME,
+-        'PR_ATTRIB_VALUE': PR_ATTRIB_VALUE,
+-        'PR_COMMENT': PR_COMMENT,
+-        'PR_DECLARATION': PR_DECLARATION,
+-        'PR_KEYWORD': PR_KEYWORD,
+-        'PR_LITERAL': PR_LITERAL,
+-        'PR_NOCODE': PR_NOCODE,
+-        'PR_PLAIN': PR_PLAIN,
+-        'PR_PUNCTUATION': PR_PUNCTUATION,
+-        'PR_SOURCE': PR_SOURCE,
+-        'PR_STRING': PR_STRING,
+-        'PR_TAG': PR_TAG,
+-        'PR_TYPE': PR_TYPE,
+-        'prettyPrintOne': win['prettyPrintOne'] = prettyPrintOne,
+-        'prettyPrint': win['prettyPrint'] = prettyPrint
+-      };
+-
+-  // Make PR available via the Asynchronous Module Definition (AMD) API.
+-  // Per https://github.com/amdjs/amdjs-api/wiki/AMD:
+-  // The Asynchronous Module Definition (AMD) API specifies a
+-  // mechanism for defining modules such that the module and its
+-  // dependencies can be asynchronously loaded.
+-  // ...
+-  // To allow a clear indicator that a global define function (as
+-  // needed for script src browser loading) conforms to the AMD API,
+-  // any global define function SHOULD have a property called "amd"
+-  // whose value is an object. This helps avoid conflict with any
+-  // other existing JavaScript code that could have defined a define()
+-  // function that does not conform to the AMD API.
+-  if (typeof define === "function" && define['amd']) {
+-    define("google-code-prettify", [], function () {
+-      return PR; 
+-    });
+-  }
+-})();
+diff --git a/requirements/tests-compiled.txt b/requirements/tests-compiled.txt
+deleted file mode 100644
+index a2527b5..0000000
+--- a/requirements/tests-compiled.txt
++++ /dev/null
+@@ -1,3 +0,0 @@
+-coverage==3.5.2
+-mock==0.8.0
+-pyquery==1.1.1
+diff --git a/settings/default.py b/settings/default.py
+index 63da85c..8dffdb5 100644
+--- a/settings/default.py
++++ b/settings/default.py
+@@ -66,15 +66,9 @@ MINIFY_BUNDLES = {
+             'css/base-768px.css',
+             'css/base-980px.css',
+         ),
+-        'api': (
+-            'css/prettify.css',
+-        ),
+         'test': (
+             'css/qunit.css',
+         ),
+-        'edit_profile': (
+-            'css/user.css',
+-        ),
+     },
+     'js': {
+         'common': (
+@@ -96,10 +90,6 @@ MINIFY_BUNDLES = {
+             'js/browserid.js',
+             'js/groups.js',
+         ),
+-        'api': (
+-            'js/libs/prettify.js',
+-            'js/api.js',
+-        ),
+         'edit_profile': (
+             'js/libs/tag-it/js/tag-it.js',
+         ),
+@@ -136,7 +126,6 @@ STS_SUBDOMAINS = True
+ # Not all URLs need locale.
+ SUPPORTED_NONLOCALES = list(base.SUPPORTED_NONLOCALES) + [
+     'csp',
+-    'api',
+ ]
+ 
+ AUTHENTICATION_BACKENDS = ('common.backends.MozilliansBrowserID',)
+@@ -160,7 +149,6 @@ INSTALLED_APPS = list(base.INSTALLED_APPS) + [
+     'cronjobs',
+     'elasticutils',
+     'sorl.thumbnail',
+-    'tastypie',
+ 
+     'django.contrib.admin',
+     'django.contrib.auth',
+@@ -171,6 +159,7 @@ INSTALLED_APPS = list(base.INSTALLED_APPS) + [
+     'south',
+     # re-assert dominance of 'django_nose'
+     'django_nose',
++
+ ]
+ 
+ ## Auth
+diff --git a/templates/500.html b/templates/500.html
+index ca501b8..c935c13 100644
+--- a/templates/500.html
++++ b/templates/500.html
+@@ -13,7 +13,7 @@
+     <p>
+       Sorry, but we encountered an unexpected error and can't process your
+       request. You can try again by refreshing your browser or you can
+-      <a href="https://bugzilla.mozilla.org/enter_bug.cgi?product=Community%20Tools&component=Phonebook">
++      <a href="https://bugzilla.mozilla.org/enter_bug.cgi?product=Websites&component=mozillians.org">
+       file a bug</a> letting us know what happened and we'll get right on
+       fixing the problem.
+     </p>
+diff --git a/templates/api.html b/templates/api.html
+deleted file mode 100644
+index ae1ddb9..0000000
+--- a/templates/api.html
++++ /dev/null
+@@ -1,18 +0,0 @@
+-<!doctype html>
+-<html class="no-js" lang="{{ LANG }}" dir="{{ DIR }}">
+-  <head>
+-    <meta charset="utf-8">
+-
+-    <title>{{ _('Mozillians API') }}</title>
+-    {{ css('api') }}
+-    {{ js('common') }}
+-    {{ js('api') }}
+-  </head>
+-  <body>
+-    {% block content %}
+-       <a id="json_url" href=""></a>
+-      <pre id="json" class="prettyprint">
+-      </pre>
+-    {% endblock %}
+-  </body>
+-</html>
+diff --git a/urls.py b/urls.py
+index f4ab81c..9f026ec 100644
+--- a/urls.py
++++ b/urls.py
+@@ -5,19 +5,9 @@ from django.shortcuts import render
+ from django.views.decorators.cache import cache_page
+ from django.views.generic.base import TemplateView
+ from django.views.i18n import javascript_catalog
+-from tastypie import api
+-from tastypie.api import Api
+-import users.api
+-import common.api
+ 
+ admin.autodiscover()
+ 
+-# Monkey patch the default serializer to also provide a to_html view.
+-api.Serializer = common.api.HTMLSerializer
+-
+-v1_api = Api(api_name='v1')
+-v1_api.register(users.api.UserProfileResource())
+-
+ 
+ def error_page(request, template, status=None):
+     """Render error templates, found in the root /templates directory.
+@@ -33,13 +23,10 @@ handler404 = lambda r: error_page(r, 404)
+ handler500 = lambda r: error_page(r, 500)
+ handler_csrf = lambda r, cb=None: error_page(r, 'csrf_error', status=400)
+ 
+-
+ urlpatterns = patterns('',
+-    url(r'^api/', include(v1_api.urls)),
+     (r'', include('users.urls')),
+     (r'', include('groups.urls')),
+ 
+-
+     (r'^csp', include('csp.urls')),
+ 
+     (r'^admin/', include(admin.site.urls)),
+diff --git a/vendor b/vendor
+index 36a690f..f1f213f 160000
+--- a/vendor
++++ b/vendor
+@@ -1 +1 @@
+-Subproject commit 36a690fb8811cbddc7a90aaf22765d590749b3d9
++Subproject commit f1f213f72d759d3c580ba4f5e1d4e67c403d70b5

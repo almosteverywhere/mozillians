@@ -31,7 +31,7 @@ class UserProfile(SearchMixin, models.Model):
     # Other fields here
     is_vouched = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True, default=datetime.now)
-    website = models.URLField(max_length=200, verbose_name=_lazy(u'Website'),
+    websites = models.TextField(verbose_name=_lazy(u'Websites'),
                               default='', blank=True, null=True)
 
     # Foreign Keys and Relationships
@@ -156,7 +156,7 @@ class UserProfile(SearchMixin, models.Model):
     def fields(self):
         """Method used by elasticutils."""
         attrs = (
-            'id', 'is_vouched', 'website', 'bio', 'display_name', 'ircname')
+            'id', 'is_vouched', 'websites', 'bio', 'display_name', 'ircname')
         d = dict((a, getattr(self, a)) for a in attrs)
         # user data
         attrs = ('username', 'first_name', 'last_name', 'email', 'last_login',
@@ -172,7 +172,7 @@ class UserProfile(SearchMixin, models.Model):
         """Sensible default search for UserProfiles."""
         query = query.lower().strip()
         fields = ('first_name__text', 'last_name__text', 'display_name__text',
-                  'username__text', 'bio__text', 'website__text',
+                  'username__text', 'bio__text', 'websites__text',
                   'email__text', 'groups__text', 'first_name__startswith',
                   'last_name__startswith', 'ircname')
         if query:

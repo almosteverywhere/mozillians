@@ -7,7 +7,7 @@ from users.models import UserProfile
 
 class UserProfileAdmin(AdminImageMixin, admin.ModelAdmin):
     fields = ['user', 'user_email', 'display_name', 'photo', 'ircname',
-              'is_vouched', 'vouched_by', 'bio', 'website', 'groups', 'skills']
+              'is_vouched', 'vouched_by', 'bio', 'websites', 'groups', 'skills']
     list_display = ['display_name', 'user_email', 'user_username', 'ircname',
                     'is_vouched', 'vouched_by']
     list_display_links = ['display_name', 'user_email', 'user_username']
