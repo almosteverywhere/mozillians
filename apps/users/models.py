@@ -35,7 +35,7 @@ class UserProfile(SearchMixin, models.Model):
     # Other fields here
     is_vouched = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True, default=datetime.now)
-    websites = models.URLField(max_length=200, verbose_name=_lazy(u'Website'),
+    websites = models.TextField(verbose_name=_lazy(u'Websites'),
                               default='', blank=True, null=True)
 
     # Foreign Keys and Relationships
