@@ -102,7 +102,7 @@ def edit_profile(request):
                        last_name=request.user.last_name,
                        username=request.user.username,
                        bio=profile.bio,
-                       website=profile.website,
+                       websites=profile.websites,
                        irc_nickname=profile.ircname,
                        groups=user_groups,
                        skills=user_skills,

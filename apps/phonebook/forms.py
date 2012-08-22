@@ -130,7 +130,7 @@ class ProfileForm(UserForm):
     class Meta:
         # Model form stuff
         model = UserProfile
-        fields = ('ircname', 'website', 'bio', 'photo', 'country', 'region',
+        fields = ('ircname', 'websites', 'bio', 'photo', 'country', 'region',
                   'city')
         widgets = {
             'bio': forms.Textarea()
