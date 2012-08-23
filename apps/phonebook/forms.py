@@ -127,6 +127,12 @@ class ProfileForm(UserForm):
                                                          required=False,
                                                          widget=UsernameWidget)
 
+    websites = forms.CharField(label=_lazy(u'Websites'),
+            max_length=200,
+            required=False,
+            widget=forms.Textarea(
+                attrs={'placeholder': 'Please separate each site by a comma.'}))
+
     class Meta:
         # Model form stuff
         model = UserProfile
